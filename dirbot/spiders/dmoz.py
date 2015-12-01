@@ -31,14 +31,14 @@ class DmozSpider(Spider):
 
     def parse(self, response):
         globalCookie = {
-            "BDUSS": "0gyREZUZ1RRQURWRUtKOXRGYmFXY3BQZ0RNdW1JVjU4cktBRzh4NkN6eDdqSU5XQVFBQUFBJCQAAAAAAAAAAAEAAADLt0ACanp0aGVrZWVwZXIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHv",
-            "BAIDUID": "2A1D3A8123DDA2BAB5B74C370704F59D:FG=1",
-            "TIEBA_USERTYPE": "a4634cd4258757360e1e06aa",
-            "TIEBAUID": "57f1b4ebc1f54535d094a24c",
-            "LONGID": "37795787"
+            "BDUSS": self.settings.get('BDUSS'),
+            "BAIDUID": self.settings.get('BAIDUID'),
+            "TIEBA_USERTYPE": self.settings.get('TIEBA_USERTYPE'),
+            "TIEBAUID": self.settings.get('TIEBAUID'),
+            "LONGID": self.settings.get('LONGID')
         }
-        for url in response.css("#frs_list_pager a::attr('href')").extract():
-        #for url in ["http://tieba.baidu.com/f?kw=%E9%98%85%E5%85%B5&ie=utf-8&pn=50"]:
+        #for url in response.css("#frs_list_pager a::attr('href')").extract():
+        for url in ["http://tieba.baidu.com/f?kw=%E9%98%85%E5%85%B5&ie=utf-8&pn=50"]:
             #百度这里给的是URL
             yield scrapy.Request(url, callback=self.parse_next_page, cookies=globalCookie)
 
