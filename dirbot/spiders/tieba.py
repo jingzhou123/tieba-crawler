@@ -52,6 +52,16 @@ class TiebaSpider(Spider):
         sel = Selector(response)
         return sel.css('.card_infoNum::text').extract()[0].strip() # format: 40,876
 
+    def parse_dir_name(self, response):
+        """TODO: Docstring for parse_dir_name.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+        sel = Selector(response)
+        return sel.css('.forum_dir_info li:last-child a::text').extract()[0].strip() # format: 40,876
+
     def parse(self, response):
         """TODO: Docstring for parse.
         :returns: TODO
@@ -64,6 +74,7 @@ class TiebaSpider(Spider):
         item['members_num'] = self.parse_members_num(response)
         item['posts_num'] = self.parse_posts_num(response)
         item['slogan'] = self.parse_slogan(response)
+        item['dir_name'] = self.parse_dir_name(response)
         items.append(item)
 
         return items

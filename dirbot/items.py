@@ -14,3 +14,4 @@ class Tieba(Item):
     members_num = Field() #关注数
     posts_num = Field() #帖子数
     slogan = Field() #贴吧标语
+    dir_name = Field() #一个贴巴的所属目录（和分类有关）
