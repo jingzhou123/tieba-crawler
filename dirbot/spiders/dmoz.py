@@ -1,6 +1,6 @@
 #coding=utf-8
 import scrapy
-from scrapy.spiders import Spider
+from cookieSpider import CookieSpider as Spider
 from scrapy.selector import Selector
 
 from dirbot.items import Website
@@ -30,13 +30,7 @@ class DmozSpider(Spider):
             #name = name[0].decode('utf-8')
 
     def parse(self, response):
-        globalCookie = {
-            "BDUSS": self.settings.get('BDUSS'),
-            "BAIDUID": self.settings.get('BAIDUID'),
-            "TIEBA_USERTYPE": self.settings.get('TIEBA_USERTYPE'),
-            "TIEBAUID": self.settings.get('TIEBAUID'),
-            "LONGID": self.settings.get('LONGID')
-        }
+        globalCookie = self.getCookies()
         #for url in response.css("#frs_list_pager a::attr('href')").extract():
         for url in ["http://tieba.baidu.com/f?kw=%E9%98%85%E5%85%B5&ie=utf-8&pn=50"]:
             #百度这里给的是URL
