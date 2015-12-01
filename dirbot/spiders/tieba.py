@@ -17,6 +17,10 @@ class TiebaSpider(Spider):
         return sel.css('.bawu_single_type.first_section a.user_name::text').extract()#吧主
 #TODO: 小吧主，图片吧务
 
+    def parse_name(self, response):
+        sel = Selector(response)
+        return sel.css('.card_title_fname::text').extract()[0].strip()
+
     def parse(self, response):
         """TODO: Docstring for parse.
         :returns: TODO
@@ -25,6 +29,7 @@ class TiebaSpider(Spider):
         items = []
         item = Tieba()
         item['owners'] = self.parse_owners(response)
+        item['name'] = self.parse_name(response)
         items.append(item)
 
         return items
