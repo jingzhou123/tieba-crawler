@@ -10,6 +10,7 @@ class TiebaSpider(Spider):
     allowed_domains = ["baidu.com"]
     start_urls = [
         "http://tieba.baidu.com/bawu2/platform/detailsInfo?ie=utf-8&word=北京邮电大学"
+        "http://tieba.baidu.com/bawu2/platform/detailsInfo?ie=utf-8&word=北京师范大学"
     ]#TODO:动态地生成一个list
 
     def parse_owners(self, response):
@@ -29,7 +30,10 @@ class TiebaSpider(Spider):
 
         """
         sel = Selector(response)
-        return sel.css('.card_slogan::text').extract()[0].strip()
+        try:
+            return sel.css('.card_slogan::text').extract()[0].strip()
+        except Exception, e:
+            return ''
 
 
     def parse_members_num(self, response):
@@ -62,7 +66,7 @@ class TiebaSpider(Spider):
         sel = Selector(response)
         return sel.css('.forum_dir_info li:last-child a::text').extract()[0].strip() # format: 40,876
 
-    def parse(self, response):
+    def parse_all(self, response):
         """TODO: Docstring for parse.
         :returns: TODO
 
@@ -79,5 +83,14 @@ class TiebaSpider(Spider):
 
         return items
 
+    def parse(self, response):
+        """TODO: Docstring for parse.
 
-        return sel.css('.card_title_fname::text').extract()[0].strip()
+        :response: TODO
+        :returns: TODO
+
+        """
+        for url in self.start_urls:
+            yield scrapy.Request(url, callback=self.parse_all)
+
+
