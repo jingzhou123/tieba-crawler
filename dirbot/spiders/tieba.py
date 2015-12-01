@@ -14,18 +14,17 @@ class TiebaSpider(Spider):
 
     def parse_owners(self, response):
         sel = Selector(response)
-        item = Tieba()
-        item['owners'] = sel.css('.bawu_single_type.first_section a.user_name::text').extract()#吧主
+        return sel.css('.bawu_single_type.first_section a.user_name::text').extract()#吧主
 #TODO: 小吧主，图片吧务
 
-        return item
     def parse(self, response):
         """TODO: Docstring for parse.
         :returns: TODO
 
         """
         items = []
-        item = self.parse_owners(response)
+        item = Tieba()
+        item['owners'] = self.parse_owners(response)
         items.append(item)
 
         return items

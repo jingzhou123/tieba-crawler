@@ -9,4 +9,4 @@ class Website(Item):
 
 class Tieba(Item):
     name = Field()
-    owners = Field()
+    owners = Field() #贴吧吧务
