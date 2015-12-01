@@ -27,7 +27,6 @@ class DmozSpider(Spider):
             items.append(item)
 
         return items
-            #name = name[0].decode('utf-8')
 
     def parse(self, response):
         globalCookie = self.getCookies()
