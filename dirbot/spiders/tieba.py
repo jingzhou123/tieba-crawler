@@ -21,6 +21,27 @@ class TiebaSpider(Spider):
         sel = Selector(response)
         return sel.css('.card_title_fname::text').extract()[0].strip()
 
+    def parse_slogan(self, response):
+        """TODO: Docstring for parse_card_slogan.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+        sel = Selector(response)
+        return sel.css('.card_slogan::text').extract()[0].strip()
+
+
+    def parse_members_num(self, response):
+        """TODO: Docstring for parse_members_num.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+        sel = Selector(response)
+        return sel.css('.card_menNum::text').extract()[0].strip() # format: 40,876
+
     def parse(self, response):
         """TODO: Docstring for parse.
         :returns: TODO
@@ -30,8 +51,11 @@ class TiebaSpider(Spider):
         item = Tieba()
         item['owners'] = self.parse_owners(response)
         item['name'] = self.parse_name(response)
+        item['members_num'] = self.parse_members_num(response)
+        item['slogan'] = self.parse_slogan(response)
         items.append(item)
 
         return items
 
 
+        return sel.css('.card_title_fname::text').extract()[0].strip()
