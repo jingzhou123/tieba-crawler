@@ -7,6 +7,19 @@ create table if not exists user (
     admin_type enum('none', 'admin', 'little_admin', 'img_admin') default 'none',
     following_num smallint default 0,
     followed_num smallint default 0,
+    tieba_age tinyint default 0,
+    posts_num bigint default 0,
+    primary key (id)
+)default charset=utf8;
+
+create table if not exists post (
+    id int not null auto_increment,
+    tieba_id int not null,
+    post_type enum('main', 'reply') not null,
+    title char(128) not null,
+    body text not null,
+    post_time datetime not null,
+    reply_num int default 0,
     primary key (id)
 )default charset=utf8;
 
