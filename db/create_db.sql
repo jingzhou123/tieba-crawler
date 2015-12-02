@@ -15,7 +15,7 @@ create table if not exists user (
 create table if not exists post (
     id int not null auto_increment,
     tieba_id int not null,
-    post_type enum('main', 'reply') not null,
+    reply_id int default 0,
     title char(128) not null,
     body text not null,
     post_time datetime not null,
