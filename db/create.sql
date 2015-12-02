@@ -14,6 +14,7 @@ create table if not exists user (
 
 create table if not exists post (
     id int not null auto_increment,
+    author_id int not null,
     tieba_id int not null,
     reply_id int default 0,
     title char(128) not null,
