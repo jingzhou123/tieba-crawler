@@ -1,5 +1,6 @@
 #coding=utf-8
 import scrapy
+import re
 from cookieSpider import CookieSpider as Spider
 from scrapy.selector import Selector
 
@@ -9,10 +10,18 @@ class TiebaSpider(Spider):
     name= "tieba"
     allowed_domains = ["baidu.com"]
     start_urls = [
-        "http://tieba.baidu.com/bawu2/platform/detailsInfo?ie=utf-8&word=北京邮电大学"
+        "http://tieba.baidu.com/bawu2/platform/detailsInfo?ie=utf-8&word=北京邮电大学",
         "http://tieba.baidu.com/bawu2/platform/detailsInfo?ie=utf-8&word=北京师范大学"
     ]#TODO:动态地生成一个list
 
+    def _to_int(self, numstr):
+        """TODO: Docstring for _to_int.
+
+        :num: a string like '403,000'
+        :returns: 403000
+
+        """
+        return int(re.sub(',', '', numstr));
     def parse_owners(self, response):
         sel = Selector(response)
         return sel.css('.bawu_single_type.first_section a.user_name::text').extract()#吧主
@@ -44,7 +53,10 @@ class TiebaSpider(Spider):
 
         """
         sel = Selector(response)
-        return sel.css('.card_menNum::text').extract()[0].strip() # format: 40,876
+        try:
+            return self._to_int(sel.css('.card_menNum::text').extract()[0].strip()) # format: 40,876
+        except:
+            return 0
 
     def parse_posts_num(self, response):
         """TODO: Docstring for parse_posts_num.
@@ -54,7 +66,10 @@ class TiebaSpider(Spider):
 
         """
         sel = Selector(response)
-        return sel.css('.card_infoNum::text').extract()[0].strip() # format: 40,876
+        try:
+            return self._to_int(sel.css('.card_infoNum::text').extract()[0].strip()) # format: 40,876
+        except:
+            return 0
 
     def parse_dir_name(self, response):
         """TODO: Docstring for parse_dir_name.

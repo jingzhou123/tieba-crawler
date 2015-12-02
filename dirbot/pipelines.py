@@ -1,5 +1,6 @@
 from scrapy.exceptions import DropItem
 from twisted.enterprise import adbapi
+import logging
 
 class TiebaPipeline(object):
     """A pipeline to store the item in a MySQL database.
@@ -10,7 +11,6 @@ class TiebaPipeline(object):
 
     def __init__(self, dbpool):
         self.dbpool = dbpool
-        print 'init..'
 
     @classmethod
     def from_settings(cls, settings):
@@ -46,19 +46,18 @@ class TiebaPipeline(object):
         if ret:
             conn.execute("""
                 UPDATE tieba
-                SET followed_num=%i, belong_dir=%s, slogan=%s
+                SET followed_num=%s, belong_dir=%s, slogan=%s
                 WHERE name=%s
-            """, (item['members_num'], item['dir_name'], item['slogan'], item['name']))
+            """, (item['members_num'], item['dir_name'], item['slogan'], item['name'], ))
             spider.log("Item updated in db: %s %r" % (item['name'], item))
         else:
             conn.execute("""
-                INSERT INTO tieba VALUES (%s, %s, %i, %i, %s)
+                INSERT INTO tieba VALUES (DEFAULT, %s, %s, DEFAULT, %s, %s)
             """, (
-                'default', item['name'], item['members_num'],
-                'default', item['slogan'], item['dir_name']))
-            spider.log("Item stored in db: %s %r" % (item['name'], item))
+                item['name'], item['members_num'], item['slogan'], item['dir_name'],
+            ))
 
     def _handle_error(self, failure, item, spider):
         """Handle occurred on db interaction."""
         # do nothing, just log
-        log.err(failure)
+        logging.error(failure)
