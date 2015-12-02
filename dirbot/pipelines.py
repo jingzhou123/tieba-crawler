@@ -10,6 +10,7 @@ class TiebaPipeline(object):
 
     def __init__(self, dbpool):
         self.dbpool = dbpool
+        print 'init..'
 
     @classmethod
     def from_settings(cls, settings):
@@ -25,4 +26,39 @@ class TiebaPipeline(object):
         return cls(dbpool)
 
     def process_item(self, item, spider):
-        return item
+        # run db query in the thread pool
+        d = self.dbpool.runInteraction(self._do_upsert, item, spider)
+        d.addErrback(self._handle_error, item, spider)
+        # at the end return the item in case of success or failure
+        d.addBoth(lambda _: item)
+        # return the deferred instead the item. This makes the engine to
+        # process next item (according to CONCURRENT_ITEMS setting) after this
+        # operation (deferred) has finished.
+        return d
+
+    def _do_upsert(self, conn, item, spider):
+        """Perform an insert or update."""
+        conn.execute("""SELECT EXISTS(
+            SELECT name FROM tieba WHERE name = %s
+        )""", (item['name'], ))
+        ret = conn.fetchone()[0]
+
+        if ret:
+            conn.execute("""
+                UPDATE tieba
+                SET followed_num=%i, belong_dir=%s, slogan=%s
+                WHERE name=%s
+            """, (item['members_num'], item['dir_name'], item['slogan'], item['name']))
+            spider.log("Item updated in db: %s %r" % (item['name'], item))
+        else:
+            conn.execute("""
+                INSERT INTO tieba VALUES (%s, %s, %i, %i, %s)
+            """, (
+                'default', item['name'], item['members_num'],
+                'default', item['slogan'], item['dir_name']))
+            spider.log("Item stored in db: %s %r" % (item['name'], item))
+
+    def _handle_error(self, failure, item, spider):
+        """Handle occurred on db interaction."""
+        # do nothing, just log
+        log.err(failure)
