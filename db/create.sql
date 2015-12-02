@@ -8,7 +8,7 @@ create table if not exists user (
     following_num smallint default 0,
     followed_num smallint default 0,
     tieba_age tinyint default 0,
-    posts_num bigint default 0,
+    posts_num int default 0,
     primary key (id)
 )default charset=utf8;
 
@@ -29,6 +29,7 @@ create table if not exists tieba (
     name char(128) not null unique,
     followed_num int default 0,
     admin_num smallint default 0,
+    posts_num int default 0,
     slogan char(128) default '',
     belong_dir char(128) default '',
     primary key (id)
