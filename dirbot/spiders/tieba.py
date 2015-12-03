@@ -34,8 +34,8 @@ class TiebaSpider(Spider):
         return len(sel.css('.user_name').extract())#职业吧主+吧主+小吧主+图片。。。
 
     def parse_name(self, response):
-        sel = Selector(response)
-        return sel.css('.card_title_fname::text').extract()[0].strip()
+        tieba_name = Selector(response).css('.card_title_fname::text').extract()[0].strip()#xx吧
+        return tieba_name[:-2]#xx
 
     def parse_slogan(self, response):
         """TODO: Docstring for parse_card_slogan.

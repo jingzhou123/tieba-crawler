@@ -1,3 +1,4 @@
+#coding=utf-8
 from scrapy.exceptions import DropItem
 from twisted.enterprise import adbapi
 import logging
@@ -35,6 +36,17 @@ class TiebaPipeline(object):
         # process next item (according to CONCURRENT_ITEMS setting) after this
         # operation (deferred) has finished.
         return d
+    def _insert_tieba_admins(self, conn, item, spider):
+        """TODO: INSERT IGNORE ...
+
+        :conn: TODO
+        :item: TODO
+        :spider: TODO
+        :returns: TODO
+        """
+
+        for name in item['admin_names']:
+            conn.execute("""INSERT IGNORE user_manage_tieba VALUES(%s, %s)""", (name, item['name']))
 
     def _do_upsert(self, conn, item, spider):
         """Perform an insert or update."""
@@ -58,6 +70,7 @@ class TiebaPipeline(object):
                 item['name'], item['members_num'], item['admin_num'],
                 item['posts_num'], item['slogan'], item['dir_name'],
             ))
+        self._insert_tieba_admins(conn, item, spider);
 
     def _handle_error(self, failure, item, spider):
         """Handle occurred on db interaction."""
