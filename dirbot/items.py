@@ -10,7 +10,7 @@ class Website(Item):
 
 class Tieba(Item):
     name = Field()
-    owners = Field() #贴吧吧务
+    admin_num = Field() #贴吧吧务
     members_num = Field() #关注数
     posts_num = Field() #帖子数
     slogan = Field() #贴吧标语

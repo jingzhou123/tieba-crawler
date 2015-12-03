@@ -25,10 +25,13 @@ class TiebaSpider(Spider):
         """
         return int(re.sub(',', '', numstr));
 
-    def parse_owners(self, response):
+    def parse_admin_num(self, response):
+        """TODO: Docstring for parse_admin_num.
+        :returns: TODO
+
+        """
         sel = Selector(response)
-        return sel.css('.bawu_single_type.first_section a.user_name::text').extract()#吧主
-#TODO: 小吧主，图片吧务
+        return len(sel.css('.user_name').extract())#职业吧主+吧主+小吧主+图片。。。
 
     def parse_name(self, response):
         sel = Selector(response)
@@ -103,7 +106,7 @@ class TiebaSpider(Spider):
         """
         items = []
         item = Tieba()
-        item['owners'] = self.parse_owners(response)
+        item['admin_num'] = self.parse_admin_num(response)
         item['name'] = self.parse_name(response)
         item['members_num'] = self.parse_members_num(response)
         item['posts_num'] = self.parse_posts_num(response)

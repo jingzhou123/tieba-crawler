@@ -46,15 +46,17 @@ class TiebaPipeline(object):
         if ret:
             conn.execute("""
                 UPDATE tieba
-                SET followed_num=%s, belong_dir=%s, slogan=%s, posts_num=%s
+                SET followed_num=%s, belong_dir=%s, slogan=%s, posts_num=%s,admin_num=%s,
                 WHERE name=%s
-            """, (item['members_num'], item['dir_name'], item['slogan'], item['posts_num'], item['name'], ))
+            """, (item['members_num'], item['dir_name'], item['slogan'],
+                item['posts_num'], item['admin_num'], item['name'], ))
             spider.log("Item updated in db: %s %r" % (item['name'], item))
         else:
             conn.execute("""
-                INSERT INTO tieba VALUES (DEFAULT, %s, %s, DEFAULT, %s, %s, %s)
+                INSERT INTO tieba VALUES (DEFAULT, %s, %s, %s, %s, %s, %s)
             """, (
-                item['name'], item['members_num'], item['posts_num'], item['slogan'], item['dir_name'],
+                item['name'], item['members_num'], item['admin_num'],
+                item['posts_num'], item['slogan'], item['dir_name'],
             ))
 
     def _handle_error(self, failure, item, spider):
