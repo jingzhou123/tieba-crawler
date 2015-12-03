@@ -99,12 +99,15 @@ class TiebaSpider(Spider):
         for url in urls_list:
             yield scrapy.Request(url, callback=self.parse_all)
 
-    def parse_all(self, response):
-        """TODO: Docstring for parse.
+    def parse_tieba_info(self, response):
+        """TODO: Docstring for parse_tieba_info.
+
+        :response: TODO
         :returns: TODO
 
         """
         item = Tieba()
+
         item['admin_num'] = self.parse_admin_num(response)
         item['name'] = self.parse_name(response)
         item['members_num'] = self.parse_members_num(response)
@@ -113,6 +116,34 @@ class TiebaSpider(Spider):
         item['dir_name'] = self.parse_dir_name(response)
 
         return item
+
+
+    def parse_user(self, response):
+        """TODO: Docstring for parse_user.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+        pass
+
+    def parse_all(self, response):
+        """TODO: Docstring for parse.
+        :returns: TODO
+
+        """
+        yield self.parse_tieba_info(response)
+
+        #获取吧务的用户信息
+        users_url_list = map(
+            lambda href: ('http://tieba.baidu.com' + href),
+            Selector(response).css('a.user_name::attr(href)').extract()
+        )
+        logging.debug('users_url_list：')
+        logging.debug(users_url_list)
+        for url in users_url_list:
+            yield Request(url, callback=self.parse_user)
+
 
 
 
