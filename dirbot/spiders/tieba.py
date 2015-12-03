@@ -1,17 +1,19 @@
 #coding=utf-8
 import scrapy
 import re
+import logging
+from scrapy import Request
 from cookieSpider import CookieSpider as Spider
 from scrapy.selector import Selector
-
 from dirbot.items import Tieba
+from dirbot.settings import TIEBA_NAMES_LIST
 
 class TiebaSpider(Spider):
     name= "tieba"
     allowed_domains = ["baidu.com"]
     start_urls = [
-        "http://tieba.baidu.com/bawu2/platform/detailsInfo?ie=utf-8&word=北京邮电大学",
-        "http://tieba.baidu.com/bawu2/platform/detailsInfo?ie=utf-8&word=北京师范大学"
+        "http://tieba.baidu.com/bawu2/platform/listBawuTeamInfo?ie=utf-8&word=北京邮电大学",
+        "http://tieba.baidu.com/bawu2/platform/listBawuTeamInfo?ie=utf-8&word=北京师范大学",
     ]#TODO:动态地生成一个list
 
     def _to_int(self, numstr):
@@ -22,6 +24,7 @@ class TiebaSpider(Spider):
 
         """
         return int(re.sub(',', '', numstr));
+
     def parse_owners(self, response):
         sel = Selector(response)
         return sel.css('.bawu_single_type.first_section a.user_name::text').extract()#吧主
@@ -81,6 +84,18 @@ class TiebaSpider(Spider):
         sel = Selector(response)
         return sel.css('.forum_dir_info li:last-child a::text').extract()[0].strip() # format: 40,876
 
+    def start_requests(self):
+        """scrapy interface
+        :returns: TODO
+
+        """
+        urls_list = map(
+                lambda name: ("http://tieba.baidu.com/bawu2/platform/listBawuTeamInfo?ie=utf-8&word=" + name),
+                TIEBA_NAMES_LIST)
+
+        for url in urls_list:
+            yield scrapy.Request(url, callback=self.parse_all)
+
     def parse_all(self, response):
         """TODO: Docstring for parse.
         :returns: TODO
@@ -98,14 +113,5 @@ class TiebaSpider(Spider):
 
         return items
 
-    def parse(self, response):
-        """TODO: Docstring for parse.
-
-        :response: TODO
-        :returns: TODO
-
-        """
-        for url in self.start_urls:
-            yield scrapy.Request(url, callback=self.parse_all)
 
 

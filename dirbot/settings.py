@@ -23,3 +23,12 @@ MYSQL_HOST = 'localhost'
 MYSQL_DBNAME = 'tieba'
 MYSQL_USER = 'root'
 MYSQL_PASSWD = 'q'
+#贴吧名称列表
+TIEBA_NAMES_LIST = [
+    '北京邮电大学',
+    '北京大学',
+    '北京林业大学',
+    '北京工业大学',
+    '清华大学',
+    '北京师范大学'
+]

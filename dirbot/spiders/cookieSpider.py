@@ -1,4 +1,4 @@
-from scrapy.spider import Spider
+from scrapy.spiders import Spider
 
 class CookieSpider(Spider):
     def getCookies(self):
