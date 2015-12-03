@@ -117,32 +117,17 @@ class TiebaSpider(Spider):
 
         return item
 
-
-    def parse_user(self, response):
-        """TODO: Docstring for parse_user.
-
-        :response: TODO
-        :returns: TODO
-
-        """
-        pass
-
     def parse_all(self, response):
         """TODO: Docstring for parse.
         :returns: TODO
 
         """
-        yield self.parse_tieba_info(response)
+        item = self.parse_tieba_info(response)
 
         #获取吧务的用户信息
-        users_url_list = map(
-            lambda href: ('http://tieba.baidu.com' + href),
-            Selector(response).css('a.user_name::attr(href)').extract()
-        )
-        logging.debug('users_url_list：')
-        logging.debug(users_url_list)
-        for url in users_url_list:
-            yield Request(url, callback=self.parse_user)
+        user_names_list = Selector(response).css('a.user_name::text').extract()
+        item['admin_names'] = user_names_list;
+        yield item;
 
 
 
