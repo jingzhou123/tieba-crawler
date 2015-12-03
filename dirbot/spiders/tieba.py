@@ -104,7 +104,6 @@ class TiebaSpider(Spider):
         :returns: TODO
 
         """
-        items = []
         item = Tieba()
         item['admin_num'] = self.parse_admin_num(response)
         item['name'] = self.parse_name(response)
@@ -112,9 +111,8 @@ class TiebaSpider(Spider):
         item['posts_num'] = self.parse_posts_num(response)
         item['slogan'] = self.parse_slogan(response)
         item['dir_name'] = self.parse_dir_name(response)
-        items.append(item)
 
-        return items
+        return item
 
 
 
