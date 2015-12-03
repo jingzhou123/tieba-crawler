@@ -46,7 +46,7 @@ class TiebaPipeline(object):
         if ret:
             conn.execute("""
                 UPDATE tieba
-                SET followed_num=%s, belong_dir=%s, slogan=%s, posts_num=%s,admin_num=%s,
+                SET followed_num=%s, belong_dir=%s, slogan=%s, posts_num=%s,admin_num=%s
                 WHERE name=%s
             """, (item['members_num'], item['dir_name'], item['slogan'],
                 item['posts_num'], item['admin_num'], item['name'], ))
