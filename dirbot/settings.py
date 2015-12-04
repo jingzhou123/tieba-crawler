@@ -26,5 +26,5 @@ MYSQL_PASSWD = 'q'
 #贴吧名称列表
 TIEBA_NAMES_LIST = [
     'asdf',
-    'asdfg'
+    '天'
 ]

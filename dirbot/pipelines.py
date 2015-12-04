@@ -3,6 +3,10 @@ from scrapy.exceptions import DropItem
 from twisted.enterprise import adbapi
 import logging
 
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
+
 class TiebaPipeline(object):
     """A pipeline to store the item in a MySQL database.
     This implementation uses Twisted's asynchronous database API.
@@ -46,7 +50,12 @@ class TiebaPipeline(object):
         """
 
         for name in item['admin_names']:
-            conn.execute("""INSERT IGNORE user_manage_tieba VALUES(%s, %s)""", (name, item['name']))
+            #logging.debug("(%s, %s)" % (name, item['name'])); #right
+            #logging.debug('%s' % (type(name))) #unicode
+            conn.execute("""
+                INSERT user_manage_tieba VALUES(%s, %s)
+                ON DUPLICATE KEY UPDATE user_name=%s, tieba_name=%s
+            """, (name, item['name'], name, item['name']))
 
     def _do_upsert(self, conn, item, spider):
         """Perform an insert or update."""
@@ -62,7 +71,6 @@ class TiebaPipeline(object):
                 WHERE name=%s
             """, (item['members_num'], item['dir_name'], item['slogan'],
                 item['posts_num'], item['admin_num'], item['name'], ))
-            spider.log("Item updated in db: %s %r" % (item['name'], item))
         else:
             conn.execute("""
                 INSERT INTO tieba VALUES (DEFAULT, %s, %s, %s, %s, %s, %s)
