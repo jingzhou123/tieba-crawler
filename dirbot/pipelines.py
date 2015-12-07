@@ -58,6 +58,7 @@ class TiebaPipeline(object):
             """, (name, item['name'], name, item['name']))
 
     def _do_upsert(self, conn, item, spider):
+        logging.debug('processing item from posts..')
         """Perform an insert or update."""
         conn.execute("""SELECT EXISTS(
             SELECT name FROM tieba WHERE name = %s
