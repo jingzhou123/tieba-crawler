@@ -13,13 +13,12 @@ create table if not exists user (
 )default charset=utf8;
 
 create table if not exists post (
-    id int not null auto_increment,
-    author_id int not null,
-    tieba_id int not null,
-    reply_id int default 0,
+    id int not null,
+    author_name char(128) not null,
+    tieba_name char(128) not null,
     title char(128) not null,
-    body text not null,
-    post_time datetime not null,
+    body text,
+    post_time datetime,
     reply_num int default 0,
     primary key (id)
 )default charset=utf8;

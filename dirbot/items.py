@@ -18,4 +18,11 @@ class Tieba(Item):
     admin_names = Field()
 
 class Post(Item):
+    author_name = Field()
+    body = Field()
     id = Field()
+    post_time = Field()
+    reply_num = Field()
+    tieba_name = Field()
+    title = Field()
+
