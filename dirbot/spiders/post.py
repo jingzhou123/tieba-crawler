@@ -69,9 +69,9 @@ class PostSpider(Spider):
         """
         logging.debug('begin parsing..')
         for item in self._parse_posts(response):
+            logging.debug('a post from spider: %r' % (item))
             yield item
 
         if len(Selector(response).css('.next.pagination-item')):
-            pass
-            #yield Request(Selector(response).css('.next.pagination-item::attr(href)').extract_first(), callback=self.parse)
+            yield Request(Selector(response).css('.next.pagination-item::attr(href)').extract_first(), callback=self.parse)
 

@@ -13,7 +13,7 @@ create table if not exists user (
 )default charset=utf8;
 
 create table if not exists post (
-    id int not null,
+    id bigint not null,
     author_name char(128) not null,
     tieba_name char(128) not null,
     title char(128) not null,

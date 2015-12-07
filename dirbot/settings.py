@@ -6,7 +6,8 @@ NEWSPIDER_MODULE = 'dirbot.spiders'
 DEFAULT_ITEM_CLASS = 'dirbot.items.Website'
 
 ITEM_PIPELINES = {
-    'dirbot.pipelines.TiebaPipeline': 100
+    'dirbot.pipelines.TiebaPipeline': 100,
+    'dirbot.pipelines.PostPipeline': 200
 }
 
 DOWNLOAD_DELAY = 1

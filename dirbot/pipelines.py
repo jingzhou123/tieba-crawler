@@ -12,6 +12,9 @@ class TbBasePipeline(object):
     def __init__(self, dbpool):
         self.dbpool = dbpool
 
+    def noop(self):
+        pass
+
     @classmethod
     def from_settings(cls, settings):
         dbargs = dict(
@@ -33,8 +36,11 @@ class TiebaPipeline(TbBasePipeline):
     """
 
     def process_item(self, item, spider):
-        if item['__type__'] != 'tieba':
-            return
+        logging.debug('processing tieba: %r' % (item))
+        if spider.name != 'tieba':
+            d = self.dbpool.runInteraction(self.noop, item, spider)
+            d.addBoth(lambda _: item)
+            return d
         # run db query in the thread pool
         d = self.dbpool.runInteraction(self._do_upsert, item, spider)
         d.addErrback(self._handle_error, item, spider)
@@ -44,6 +50,7 @@ class TiebaPipeline(TbBasePipeline):
         # process next item (according to CONCURRENT_ITEMS setting) after this
         # operation (deferred) has finished.
         return d
+
     def _insert_tieba_admins(self, conn, item, spider):
         """TODO: INSERT IGNORE ...
 
@@ -83,9 +90,76 @@ class TiebaPipeline(TbBasePipeline):
                 item['name'], item['members_num'], item['admin_num'],
                 item['posts_num'], item['slogan'], item['dir_name'],
             ))
+
         self._insert_tieba_admins(conn, item, spider);
 
     def _handle_error(self, failure, item, spider):
         """Handle occurred on db interaction."""
         # do nothing, just log
         logging.error(failure)
+
+class PostPipeline(TbBasePipeline):
+
+    """Docstring for PostPipeline. """
+    def process_item(self, item, spider):
+        """TODO: Docstring for process_item.
+
+        :item: TODO
+        :returns: TODO
+
+        """
+        logging.debug('processing post: %r' % (item))
+        if spider.name != 'post':
+            d = self.dbpool.runInteraction(self.noop, item, spider)
+            d.addBoth(lambda _: item)
+            return d
+        # run db query in the thread pool
+        d = self.dbpool.runInteraction(self._do_upsert, item, spider)
+        d.addErrback(self._handle_error, item, spider)
+        # at the end return the item in case of success or failure
+        d.addBoth(lambda _: item)
+        # return the deferred instead the item. This makes the engine to
+        # process next item (according to CONCURRENT_ITEMS setting) after this
+        # operation (deferred) has finished.
+        return d
+
+    def _fill_in_data(self, item):
+        """TODO: Docstring for _fill_in_data.
+
+        :item: TODO
+        :returns: TODO
+
+        """
+        item['id'] = int(item['id'])
+        item['reply_num'] = int(item['reply_num'])
+        item['post_time'] = '1970-1-1'# shim data
+
+        return item
+
+    def _do_upsert(self, conn, item, spider):
+        """TODO: Docstring for _do_upsert.
+        :returns: TODO
+
+        """
+        #logging.debug('filtering ads...')
+        #logging.debug('post: %r' % (item))
+        if item['id'] == '-1':#广告贴
+            return
+        logging.debug('filtered ads...')
+
+        item = self._fill_in_data(item)
+        conn.execute(
+            """INSERT INTO post values(%s, %s, %s, %s, %s, %s, %s)
+               ON DUPLICATE KEY UPDATE author_name=%s, tieba_name=%s, title=%s, body=%s, post_time=%s, reply_num=%s""",
+            (
+                item['id'], item['author_name'], item['tieba_name'], item['title'], item['body'], item['post_time'], item['reply_num'],
+                #values to update
+                item['author_name'], item['tieba_name'], item['title'], item['body'], item['post_time'], item['reply_num']
+            )
+        )
+
+    def _handle_error(self, failure, item, spider):
+        """Handle occurred on db interaction."""
+        # do nothing, just log
+        logging.error(failure)
+
