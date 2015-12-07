@@ -124,6 +124,7 @@ class TiebaSpider(Spider):
         item['slogan'] = self.parse_slogan(response)
         item['dir_name'] = self.parse_dir_name(response)
         item['admin_names'] = self.parse_admin_users(response)
+        item['__type__'] = 'tieba'
 
         return item
 

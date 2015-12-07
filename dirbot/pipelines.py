@@ -7,13 +7,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-class TiebaPipeline(object):
-    """A pipeline to store the item in a MySQL database.
-    This implementation uses Twisted's asynchronous database API.
-    code below is referred from
-    'https://github.com/rolando/dirbot-mysql/blob/master/dirbot/pipelines.py'
-    """
-
+class TbBasePipeline(object):
+    """docstring for TbBasePipeline"""
     def __init__(self, dbpool):
         self.dbpool = dbpool
 
@@ -30,7 +25,16 @@ class TiebaPipeline(object):
         dbpool = adbapi.ConnectionPool('MySQLdb', **dbargs)
         return cls(dbpool)
 
+class TiebaPipeline(TbBasePipeline):
+    """A pipeline to store the item in a MySQL database.
+    This implementation uses Twisted's asynchronous database API.
+    code below is referred from
+    'https://github.com/rolando/dirbot-mysql/blob/master/dirbot/pipelines.py'
+    """
+
     def process_item(self, item, spider):
+        if item['__type__'] != 'tieba':
+            return
         # run db query in the thread pool
         d = self.dbpool.runInteraction(self._do_upsert, item, spider)
         d.addErrback(self._handle_error, item, spider)
