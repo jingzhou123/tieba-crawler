@@ -73,11 +73,16 @@ class PostSpider(Spider):
         :returns: TODO
 
         """
-        logging.debug('begin parsing..')
         for item in self._parse_posts(response):
-            logging.debug('a post from spider: %r' % (item))
             yield item
 
-        if len(Selector(response).css('.next.pagination-item')):
-            yield Request(Selector(response).css('.next.pagination-item::attr(href)').extract_first(), callback=self.parse)
+        if len(Selector(response).css('#frs_list_pager .next')):
+            #贴吧的分页有的不是完整的链接
+            next_page_url = Selector(response).css('#frs_list_pager .next::attr(href)').extract_first()
+            logging.debug('next_page_url %s', next_page_url)
+            if -1 != next_page_url.find('http://tieba.baidu.com'):
+                yield Request(next_page_url, callback=self.parse)
+            else:
+                yield Request('http://tieba.baidu.com' + next_page_url, callback=self.parse)
+
 
