@@ -39,21 +39,27 @@ class PostSpider(Spider):
         :returns: TODO
 
         """
-        logging.debug('parsing a post..')
+        #logging.debug('parsing a post..')
         tieba_name = Selector(response).css('.card_title_fname::text').extract_first().strip()[:-1]# XX吧 -> XX
         post_item_sels = Selector(response).css('#thread_list>li')
-        logging.debug('posts total num: %s', len(post_item_sels))
+        #logging.debug('posts total num: %s', len(post_item_sels))
 
         for sel in post_item_sels:
             item = Post()
-            item['tieba_name'] = tieba_name
-            logging.debug('post id: %s' % (sel.css('.j_th_tit a::attr(href)').extract_first()))
             item['id'] = self._extract_post_id(sel.css('.j_th_tit a::attr(href)').extract_first())
+            #logging.debug('post id: %s' % (sel.css('.j_th_tit a::attr(href)').extract_first()))
+
+            item['tieba_name'] = tieba_name
             item['title'] = sel.css('.j_th_tit a::text').extract_first()# 有时标题过长会被截断，在帖子回复爬虫里再爬一遍完整的标题
             item['reply_num'] = sel.css('.threadlist_rep_num::text').extract_first()# 这里有可能是‘推广’,而非数字，在pipeline里过滤一遍
             item['author_name'] = sel.css('.tb_icon_author a::text').extract_first()
-            item['body'] = sel.css('.threadlist_detail .threadlist_abs_onlyline::text').extract_first().strip()
-        #item['post_time'] = sel.css('') #这里拿不到发贴时间，只有最后回复时间
+            item['body'] = sel.css('.threadlist_detail .threadlist_abs_onlyline::text').extract_first()
+            #遇到取不到帖子内容的情况，有可能是广告或者其它类型的无ID的贴子
+            if item['body'] is None:
+                item['body'] = ''
+            else:
+                item['body'] = item['body'].strip()#去掉回车和空格
+            #item['post_time'] = sel.css('') #这里拿不到发贴时间，只有最后回复时间
             logging.debug('帖子：%r' % (item))
 
             yield item
