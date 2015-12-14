@@ -5,6 +5,7 @@ from dbSpider import DbSpider
 from scrapy import Request, Selector
 from dirbot.items import Reply
 import logging
+from uuid import uuid1 as uuid
 
 class ReplySpider(CookieSpider, DbSpider):
 
@@ -30,14 +31,20 @@ class ReplySpider(CookieSpider, DbSpider):
         """
         pass
 
-    def _parse_reply(self, post):
+    def _parse_reply(self, post, response):
         """TODO: Docstring for _parse_reply.
 
         :post: TODO
         :returns: TODO
 
         """
-        pass
+        item = self._parse_general_post(post, response)
+        item['id'] = str(uuid().int>>64)[0:16]
+        item['post_id'] = response.meta['post_id']
+        item['author_name'] = post.css('.d_name a::text').extract_first()
+        item['type'] = None
+
+        return item
 
     def _parse_comments(self, post):
         """TODO: Docstring for _parse_comments.
@@ -60,6 +67,23 @@ class ReplySpider(CookieSpider, DbSpider):
         else:
             return time
 
+    def _parse_general_post(self, post, response):
+        """TODO: Docstring for _parse_general_post.
+
+        :post: TODO
+        :response: TODO
+        :returns: TODO
+
+        """
+        item = Reply()
+        #拼接字符串
+        item['body'] = ''.join(post.css('cc div::text').extract()).strip()
+        item['title'] = Selector(response).css('h3.core_title_txt::text').extract_first()
+        item['post_time'] = self._fill_time(post.css('.post-tail-wrap span.tail-info:last-child::text').extract_first())
+        #TODO: time
+
+        return item;
+
     def _parse_main_post(self, post, response):
         """TODO: Docstring for _parse_main_post.
 
@@ -67,14 +91,9 @@ class ReplySpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
-        item = Reply()
-        item['type'] = 'MAIN'
-        #拼接字符串
-        item['body'] = ''.join(post.css('cc div::text').extract()).strip()
-        item['title'] = Selector(response).css('h3.core_title_txt::text').extract_first()
-        item['post_time'] = self._fill_time(post.css('.post-tail-wrap span.tail-info:last-child::text').extract_first())
+        item = self._parse_general_post(post, response)
         item['id'] = response.meta['post_id']
-        #TODO: time
+        item['type'] = 'MAIN'
 
         return item;
 
@@ -113,8 +132,9 @@ class ReplySpider(CookieSpider, DbSpider):
             if i == 0:
                 logging.debug('main post: %r', self._parse_main_post(post, response))
                 yield self._parse_main_post(post, response)
-            #else:
-            #    yield self._parse_reply(post)
+            else:
+                logging.debug('reply which is not main post: %r' % (self._parse_reply(posts[0], response)))
+                yield self._parse_reply(post, response)
 
             #if self._has_comments(post):
             #    self._parse_comments(post)

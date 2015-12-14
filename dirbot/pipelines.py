@@ -174,7 +174,7 @@ class ReplyPipeline(TbBasePipeline):
 
     """Docstring for ReplyPipeline. """
 
-    def _do_update(self, conn, item, spider):
+    def _do_upsert(self, conn, item, spider):
         """TODO: Docstring for _do_update.
 
         :item: TODO
@@ -182,9 +182,15 @@ class ReplyPipeline(TbBasePipeline):
         :returns: TODO
 
         """
-        logging.debug('reply: %r' % (item))
-        conn.execute("""UPDATE post SET title=%s, body=%s, post_time=%s where id=%s""",
-                (item['title'], item['body'], item['post_time'], item['id']))
+        if item['type'] == 'MAIN':
+            #conn.execute("""UPDATE post SET title=%s, body=%s, post_time=%s where id=%s""", (item['title'], item['body'], item['post_time'], item['id']))
+            pass
+        else:
+            logging.debug('item id: %s' % (item['id']))
+            #conn.execute("""INSERT INTO reply SET title=%s, author_name=%s, body=%s, post_time=%s, id=%s, post_id=%s""", (item['title'], item['author_name'], item['body'], item['post_time'], item['id'], item['post_id']))
+            logging.debug("""INSERT INTO reply values(%s, %s, %s, %s, %s, %s, %s, %s)""" % (item['author_name'], item['body'], item['id'], '天', item['title'], item['post_time'], item['post_id'], 'DEFAULT'))
+            conn.execute("""INSERT INTO reply values(%s, %s, %s, %s, %s, %s, %s, %s)""", (item['author_name'], item['body'], item['id'], '天', item['title'], item['post_time'], item['post_id'], 'DEFAULT'))
+
     def process_item(self, item, spider):
         if spider.name != 'reply':
             d = self.dbpool.runInteraction(self.noop, item, spider)
@@ -192,7 +198,9 @@ class ReplyPipeline(TbBasePipeline):
             return d
 
         logging.debug('processing reply: %r' % (item))
-        d = self.dbpool.runInteraction(self._do_update, item, spider)
+        d = self.dbpool.runInteraction(self._do_upsert, item, spider)
         d.addErrback(self._handle_error, item, spider)
         # at the end return the item in case of success or failure
         d.addBoth(lambda _: item)
+
+        return d

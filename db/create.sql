@@ -24,12 +24,13 @@ create table if not exists post (
 )default charset=utf8;
 
 create table if not exists reply (
-    id bigint not null,
     author_name char(128) not null,
+    body text,
+    id bigint not null,
     tieba_name char(128) not null,
     title char(128) not null,
-    body text,
     post_time datetime,
+    post_id bigint not null,
     reply_num int default 0,
     primary key (id)
 )default charset=utf8;
