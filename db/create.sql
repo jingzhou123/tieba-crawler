@@ -23,6 +23,17 @@ create table if not exists post (
     primary key (id)
 )default charset=utf8;
 
+create table if not exists reply (
+    id bigint not null,
+    author_name char(128) not null,
+    tieba_name char(128) not null,
+    title char(128) not null,
+    body text,
+    post_time datetime,
+    reply_num int default 0,
+    primary key (id)
+)default charset=utf8;
+
 create table if not exists tieba (
     id int not null auto_increment,
     name char(128) not null unique,

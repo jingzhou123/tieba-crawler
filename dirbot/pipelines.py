@@ -15,6 +15,11 @@ class TbBasePipeline(object):
     def noop(self):
         pass
 
+    def _handle_error(self, failure, item, spider):
+        """Handle occurred on db interaction."""
+        # do nothing, just log
+        logging.error(failure)
+
     @classmethod
     def from_settings(cls, settings):
         dbargs = dict(
@@ -36,11 +41,12 @@ class TiebaPipeline(TbBasePipeline):
     """
 
     def process_item(self, item, spider):
-        logging.debug('processing tieba: %r' % (item))
         if spider.name != 'tieba':
             d = self.dbpool.runInteraction(self.noop, item, spider)
             d.addBoth(lambda _: item)
             return d
+
+        logging.debug('processing tieba: %r' % (item))
         # run db query in the thread pool
         d = self.dbpool.runInteraction(self._do_upsert, item, spider)
         d.addErrback(self._handle_error, item, spider)
@@ -108,11 +114,12 @@ class PostPipeline(TbBasePipeline):
         :returns: TODO
 
         """
-        logging.debug('processing post: %r' % (item))
         if spider.name != 'post':
             d = self.dbpool.runInteraction(self.noop, item, spider)
             d.addBoth(lambda _: item)
             return d
+
+        logging.debug('processing post: %r' % (item))
         # run db query in the thread pool
         d = self.dbpool.runInteraction(self._do_upsert, item, spider)
         d.addErrback(self._handle_error, item, spider)
@@ -163,3 +170,29 @@ class PostPipeline(TbBasePipeline):
         # do nothing, just log
         logging.error(failure)
 
+class ReplyPipeline(TbBasePipeline):
+
+    """Docstring for ReplyPipeline. """
+
+    def _do_update(self, conn, item, spider):
+        """TODO: Docstring for _do_update.
+
+        :item: TODO
+        :spider: TODO
+        :returns: TODO
+
+        """
+        logging.debug('reply: %r' % (item))
+        conn.execute("""UPDATE post SET title=%s, body=%s, post_time=%s where id=%s""",
+                (item['title'], item['body'], item['post_time'], item['id']))
+    def process_item(self, item, spider):
+        if spider.name != 'reply':
+            d = self.dbpool.runInteraction(self.noop, item, spider)
+            d.addBoth(lambda _: item)
+            return d
+
+        logging.debug('processing reply: %r' % (item))
+        d = self.dbpool.runInteraction(self._do_update, item, spider)
+        d.addErrback(self._handle_error, item, spider)
+        # at the end return the item in case of success or failure
+        d.addBoth(lambda _: item)

@@ -26,3 +26,6 @@ class Post(Item):
     tieba_name = Field()
     title = Field()
 
+class Reply(Post):
+    type = Field()# 如果是'MAIN'说明是一个主贴
+
