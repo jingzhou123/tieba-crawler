@@ -12,6 +12,14 @@ create table if not exists user (
     primary key (id)
 )default charset=utf8;
 
+create table if not exists comment (
+    id bigint not null,
+    author_name char(128) not null,
+    body text,
+    post_time datetime,
+    primary key (id)
+)default charset=utf8;
+
 create table if not exists post (
     id bigint not null,
     author_name char(128) not null,
