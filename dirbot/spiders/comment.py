@@ -54,6 +54,16 @@ class CommentSpider(CookieSpider, DbSpider):
             logging.debug('comment: %r' % (item))
             yield item
 
+        self._parse_next_page(response)
+
+    def _parse_next_page(self, response):
+        """TODO: Docstring for _parse_next_page.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+
     def _fill_time(self, time):
         """TODO: Docstring for _fill_time.
 
