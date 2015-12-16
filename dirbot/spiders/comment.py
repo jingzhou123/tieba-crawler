@@ -50,7 +50,9 @@ class CommentSpider(CookieSpider, DbSpider):
             item['id'] = comment_json['spid']# 直接取百度的id
             item['author_name'] = comment_json['user_name']
             item['post_time'] = self._fill_time(sel.css('.lzl_time::text').extract_first())
+            item['reply_id'] = response.meta['reply_id']
             logging.debug('comment: %r' % (item))
+            yield item
 
     def _fill_time(self, time):
         """TODO: Docstring for _fill_time.

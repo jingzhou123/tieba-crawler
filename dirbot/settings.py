@@ -8,7 +8,8 @@ DEFAULT_ITEM_CLASS = 'dirbot.items.Website'
 ITEM_PIPELINES = {
     'dirbot.pipelines.TiebaPipeline': 100,
     'dirbot.pipelines.PostPipeline': 200,
-    'dirbot.pipelines.ReplyPipeline': 300
+    'dirbot.pipelines.ReplyPipeline': 300,
+    'dirbot.pipelines.CommentPipeline': 400
 }
 
 DOWNLOAD_DELAY = 1

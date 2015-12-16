@@ -204,3 +204,44 @@ class ReplyPipeline(TbBasePipeline):
         d.addBoth(lambda _: item)
 
         return d
+
+class CommentPipeline(TbBasePipeline):
+    """Docstring for CommentPipeline. """
+
+    def _do_upsert(self, conn, item, spider):
+        """TODO: Docstring for _do_upsert.
+        :returns: TODO
+
+        """
+        logging.debug('item inserted: %r' % (item))
+
+        conn.execute("""
+            INSERT comment VALUES(%s, %s, %s, %s, %s)
+            ON DUPLICATE KEY UPDATE id=%s, reply_id=%s, author_name=%s, body=%s, post_time=%s
+        """, (
+            item['id'], item['reply_id'], item['author_name'], item['body'], item['post_time'],
+            item['id'], item['reply_id'], item['author_name'], item['body'], item['post_time']
+        ))
+
+    def process_item(self, item, spider):
+        """TODO: Docstring for process_item.
+
+        :item: TODO
+        :spider: TODO
+        :returns: TODO
+
+        """
+        if spider.name != 'comment':
+            d = self.dbpool.runInteraction(self.noop, item, spider)
+            d.addBoth(lambda _: item)
+            return d
+
+        logging.debug('processing comment: %r' % (item))
+        d = self.dbpool.runInteraction(self._do_upsert, item, spider)
+        d.addErrback(self._handle_error, item, spider)
+        # at the end return the item in case of success or failure
+        d.addBoth(lambda _: item)
+
+        return d
+
+
