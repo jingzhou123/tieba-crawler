@@ -43,7 +43,8 @@ class ReplySpider(CookieSpider, DbSpider):
 
         """
         item = self._parse_general_post(post, response)
-        item['id'] = str(uuid().int>>64)[0:16]
+        #item['id'] = str(uuid().int>>64)[0:16]
+        item['id'] = json.loads(post.css('::attr(data-field)').extract_first())['content']['post_id']# 百度给出的一条评论的id
         item['post_id'] = response.meta['post_id']
         item['author_name'] = post.css('.d_name a::text').extract_first()
         item['type'] = None
@@ -107,23 +108,22 @@ class ReplySpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
-        """
         try:
             i = 0
+            step = 50
             while True:
-                rows = self._query_posts(i, 50)
+                rows = self._query_posts(i, step)
                 if rows:
                     for row in rows:
                         logging.debug("an post's id: %r" % row[0])
                         post_id = str(row[0])
                         yield Request('http://tieba.baidu.com/p/' + post_id, callback=self.parse, meta={'post_id': post_id})
-                    i = i + 50
+                    i = i + step
                 else:
                     break
         except Exception, e:
             raise e
-        """
-        yield Request('http://tieba.baidu.com/p/' + '737767258', callback=self.parse, meta={'post_id': 737767258})
+        #yield Request('http://tieba.baidu.com/p/' + '737767258', callback=self.parse, meta={'post_id': 737767258})
 
     def parse(self, response):
         """TODO: Docstring for parse.
