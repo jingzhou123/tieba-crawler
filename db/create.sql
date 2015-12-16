@@ -14,6 +14,7 @@ create table if not exists user (
 
 create table if not exists comment (
     id bigint not null,
+    reply_id bigint not null,
     author_name char(128) not null,
     body text,
     post_time datetime,

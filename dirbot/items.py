@@ -36,3 +36,12 @@ class Reply(Item):
     type = Field()# 如果是'MAIN'说明是一个主贴
     post_id = Field()# 记录是哪个主贴的回复
 
+class Comment(Item):
+    author_name = Field()
+    body = Field()
+    id = Field()
+    post_time = Field()
+    reply_id = Field()# 记录是哪个回复评论
+
+
+
