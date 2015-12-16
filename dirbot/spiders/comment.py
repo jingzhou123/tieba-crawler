@@ -1,3 +1,5 @@
+#coding=utf-8
+
 from cookieSpider import CookieSpider
 from dbSpider import DbSpider
 from scrapy import Request, Selector
@@ -6,6 +8,7 @@ from dirbot.items import Reply
 class CommentSpider(CookieSpider, DbSpider):
 
     """crawl a post's reply's comments"""
+    request_url_tmpl = 'http://tieba.baidu.com/p/comment?tid=%s&pid=%s&pn=1'
     name = 'comment'
 
     def _query_replies(self, start_index, num):
@@ -43,13 +46,11 @@ class CommentSpider(CookieSpider, DbSpider):
                 for row in rows:
                     reply_id = row[0]
                     post_id = row[1]
-                    yield Request('http://tieba.baidu.com/p/comment?tid=' + str(post_id) + '&pid=' + str(reply_id) + '&pn=1',
+                    yield Request(self.request_url_tmpl % (post_id, reply_id), # tid is 主贴的id, pid是回复的id
                             callback=self.parse,
                             meta={'post_id': post_id, 'reply_id': reply_id})
 
                 i = i + step
             else:
                 break
-
-
 
