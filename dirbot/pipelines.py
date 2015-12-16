@@ -188,8 +188,8 @@ class ReplyPipeline(TbBasePipeline):
         else:
             logging.debug('item id: %s' % (item['id']))
             #conn.execute("""INSERT INTO reply SET title=%s, author_name=%s, body=%s, post_time=%s, id=%s, post_id=%s""", (item['title'], item['author_name'], item['body'], item['post_time'], item['id'], item['post_id']))
-            logging.debug("""INSERT INTO reply values(%s, %s, %s, %s, %s, %s, %s, %s)""" % (item['author_name'], item['body'], item['id'], '天', item['title'], item['post_time'], item['post_id'], 'DEFAULT'))
-            conn.execute("""INSERT INTO reply values(%s, %s, %s, %s, %s, %s, %s, %s)""", (item['author_name'], item['body'], item['id'], '天', item['title'], item['post_time'], item['post_id'], 'DEFAULT'))
+            #logging.debug("""INSERT INTO reply values(%s, %s, %s, %s, %s, %s, %s, %s)""" % (item['author_name'], item['body'], item['id'], '天', item['title'], item['post_time'], item['post_id'], ''))
+            conn.execute("""INSERT INTO reply values(%s, %s, %s, %s, %s, %s, %s, %s)""", (item['author_name'], item['body'], item['id'], '天', item['title'], item['post_time'], item['post_id'], item['reply_num']))
 
     def process_item(self, item, spider):
         if spider.name != 'reply':

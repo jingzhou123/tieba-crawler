@@ -5,6 +5,7 @@ from dbSpider import DbSpider
 from scrapy import Request, Selector
 from dirbot.items import Reply
 import logging
+import json
 from uuid import uuid1 as uuid
 
 class ReplySpider(CookieSpider, DbSpider):
@@ -31,6 +32,18 @@ class ReplySpider(CookieSpider, DbSpider):
         """
         pass
 
+    def _parse_reply_num(self, post):
+        """提取一个主贴的回复的评论数
+
+        :post: TODO
+        :returns: TODO
+
+        """
+        #return this "{"total_num": null_or_num}"
+        json_str = post.css('div.p_reply::attr(data-field)').extract_first()
+        #有的并没有这个div
+        return (json_str and json.loads(json_str)['total_num']) or 0
+
     def _parse_reply(self, post, response):
         """TODO: Docstring for _parse_reply.
 
@@ -43,6 +56,7 @@ class ReplySpider(CookieSpider, DbSpider):
         item['post_id'] = response.meta['post_id']
         item['author_name'] = post.css('.d_name a::text').extract_first()
         item['type'] = None
+        item['reply_num'] = self._parse_reply_num(post)
 
         return item
 
@@ -118,7 +132,7 @@ class ReplySpider(CookieSpider, DbSpider):
         except Exception, e:
             raise e
         """
-        yield Request('http://tieba.baidu.com/p/' + '4191511745', callback=self.parse, meta={'post_id': 4191511745})
+        yield Request('http://tieba.baidu.com/p/' + '3108156427', callback=self.parse, meta={'post_id': 3108156427})
 
     def parse(self, response):
         """TODO: Docstring for parse.
