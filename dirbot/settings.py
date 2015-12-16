@@ -27,6 +27,5 @@ MYSQL_USER = 'root'
 MYSQL_PASSWD = 'q'
 #贴吧名称列表
 TIEBA_NAMES_LIST = [
-    #'天水',
-    '天'
+    '心理',
 ]

@@ -26,7 +26,13 @@ class Post(Item):
     tieba_name = Field()
     title = Field()
 
-class Reply(Post):
+class Reply(Item):
+    author_name = Field()
+    body = Field()
+    id = Field()
+    post_time = Field()
+    reply_num = Field()
+    title = Field()
     type = Field()# 如果是'MAIN'说明是一个主贴
     post_id = Field()# 记录是哪个主贴的回复
 

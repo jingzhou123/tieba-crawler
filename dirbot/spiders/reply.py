@@ -23,15 +23,6 @@ class ReplySpider(CookieSpider, DbSpider):
         cursor.execute("""SELECT id from post limit %s, %s""", (start_index, num));
         return cursor.fetchall()
 
-    def _has_comments(self, post):
-        """TODO: Docstring for _has_comments.
-
-        :post: TODO
-        :returns: TODO
-
-        """
-        pass
-
     def _parse_reply_num(self, post):
         """提取一个主贴的回复的评论数
 
@@ -132,7 +123,7 @@ class ReplySpider(CookieSpider, DbSpider):
         except Exception, e:
             raise e
         """
-        yield Request('http://tieba.baidu.com/p/' + '3108156427', callback=self.parse, meta={'post_id': 3108156427})
+        yield Request('http://tieba.baidu.com/p/' + '737767258', callback=self.parse, meta={'post_id': 737767258})
 
     def parse(self, response):
         """TODO: Docstring for parse.
@@ -140,18 +131,16 @@ class ReplySpider(CookieSpider, DbSpider):
 
         """
         posts = Selector(response).css('.p_postlist .l_post')
-        logging.debug('posts num: %s', len(posts))
 
         for i, post in enumerate(posts):
             if i == 0:
-                logging.debug('main post: %r', self._parse_main_post(post, response))
                 yield self._parse_main_post(post, response)
             else:
-                logging.debug('reply which is not main post: %r' % (self._parse_reply(posts[0], response)))
-                yield self._parse_reply(post, response)
+                item = self._parse_reply(post, response)
+                yield item
 
-            #if self._has_comments(post):
-            #    self._parse_comments(post)
+                if item['reply_num'] != 0:# 评论数
+                    self._parse_comments(post)
 
 
 
