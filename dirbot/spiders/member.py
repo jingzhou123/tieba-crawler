@@ -25,6 +25,7 @@ class MemberSpider(CookieSpider, DbSpider):
 
     def url_from_row(self, row):
         return self.request_url_tmpl % (row[0], 1)
+
     def next_page(self, response):
         """TODO: Docstring for next_page.
 
@@ -32,7 +33,7 @@ class MemberSpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
-        return None
+        return 'http://tieba.baidu.com' + Selector(response).css('.next_page::attr(href)').extract_first()
 
     def empty_page(self, response):
         """TODO: Docstring for empty_page.
@@ -50,12 +51,13 @@ class MemberSpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
+
         items = []
         for user_name in Selector(response).css('.user_name::attr(title)').extract():
             item = UserFollowTiebaRel()
             item['user_name'] = user_name
             item['tieba_name'] = response.meta['row'][0] #tieba_name
-            logging.debug('meta: %r' % (response.meta))
+            #logging.debug('meta: %r' % (response.meta))
             items.append(item)
 
         return items

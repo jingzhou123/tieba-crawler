@@ -89,14 +89,16 @@ class DbSpider(Spider):
         """
 
         if self.empty_page(response):
+            logging.debug('page empty?')
             return
 
         for item in self.parse_page(response):
             yield item
 
         next_page_url = self.next_page(response)
+        logging.debug('next page url: %s' % (next_page_url))
         if next_page_url:
-            yield Request(next_page_url, callback=self.parse_page, meta={'row': response.meta['row']})
+            yield Request(next_page_url, callback=self.parse, meta={'row': response.meta['row']})
 
 
 
