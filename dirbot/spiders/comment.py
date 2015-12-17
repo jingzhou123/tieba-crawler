@@ -51,18 +51,36 @@ class CommentSpider(CookieSpider, DbSpider):
             item['author_name'] = comment_json['user_name']
             item['post_time'] = self._fill_time(sel.css('.lzl_time::text').extract_first())
             item['reply_id'] = response.meta['reply_id']
-            logging.debug('comment: %r' % (item))
+            #logging.debug('comment: %r' % (item))
             yield item
 
-        self._parse_next_page(response)
+        logging.debug('before parsing next page if existed..')
+        meta = response.meta
+        next_page = self._get_next_page(response)
+        if  next_page > meta['cur_page']: #meta.reply_id meta.post_id
+            yield Request(self.request_url_tmpl % (meta['post_id'], meta['reply_id'], next_page),
+                    callback=self.parse, meta={'post_id': meta['post_id'], 'reply_id': meta['reply_id'], 'cur_page': next_page}) # tid is 主贴的id, pid是回复的id
 
-    def _parse_next_page(self, response):
+    def _get_next_page(self, response):
         """TODO: Docstring for _parse_next_page.
 
         :response: TODO
         :returns: TODO
 
         """
+        #logging.debug('beginning parsing next page if existed..')
+        meta = response.meta
+        anchor_sels = Selector(response).css('.j_pager a')
+        next_page = 1
+        #logging.debug('anchor selectors: %r' % (anchor_sels))
+        for sel in anchor_sels:
+            #logging.debug('pager anchor text: ' % (sel.css('::text').extract_first()))
+            if sel.css('::text').extract_first() == '下一页':
+                next_page = sel.css('::attr(href)').extract_first()[1:]
+                logging.debug('next page num: %s' % (next_page))
+
+        return int(next_page)
+
 
     def _fill_time(self, time):
         """TODO: Docstring for _fill_time.
@@ -92,7 +110,7 @@ class CommentSpider(CookieSpider, DbSpider):
                     post_id = row[1]
                     yield Request(self.request_url_tmpl % (post_id, reply_id, 1), # tid is 主贴的id, pid是回复的id
                             callback=self.parse,
-                            meta={'post_id': post_id, 'reply_id': reply_id})
+                            meta={'post_id': post_id, 'reply_id': reply_id, 'cur_page': 1})
 
                 i = i + step
             else:

@@ -236,7 +236,7 @@ class CommentPipeline(TbBasePipeline):
             d.addBoth(lambda _: item)
             return d
 
-        logging.debug('processing comment: %r' % (item))
+        #logging.debug('processing comment: %r' % (item))
         d = self.dbpool.runInteraction(self._do_upsert, item, spider)
         d.addErrback(self._handle_error, item, spider)
         # at the end return the item in case of success or failure
