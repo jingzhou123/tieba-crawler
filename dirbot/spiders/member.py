@@ -42,7 +42,8 @@ class MemberSpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
-        return False
+
+        return len(Selector(response).css('.user_name').extract()) == 0
 
     def parse_page(self, response):
         """TODO: Docstring for parse.
