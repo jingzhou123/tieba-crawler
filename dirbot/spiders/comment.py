@@ -51,7 +51,7 @@ class CommentSpider(CookieSpider, DbSpider):
             item['author_name'] = comment_json['user_name']
             item['post_time'] = self._fill_time(sel.css('.lzl_time::text').extract_first())
             item['reply_id'] = response.meta['reply_id']
-            #logging.debug('comment: %r' % (item))
+            logging.debug('comment: %r' % (item))
             yield item
 
         logging.debug('before parsing next page if existed..')

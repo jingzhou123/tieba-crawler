@@ -19,19 +19,32 @@ class DbSpider(Spider):
             use_unicode=True,
         )
         self.conn = MySQLdb.connect(**dbargs)
-    def get_query_sql(self):
-        """TODO: Docstring for get_query_sql.
+
+    def query_some_records(self, start_index = 0, num = 50):
+        """TODO: Docstring for query_some_records.
+
+        :start_index: TODO
+        :num: TODO
         :returns: TODO
 
         """
         pass
 
-    def query_records(self, start_index = 0, step = 50):
+    def _query_records(self, start_index = 0, step = 50):
         """TODO: Docstring for query_records.
         :returns: yield a row from database, etc user's name
 
         """
+        i = start_index
+        while True:
+            rows = self.query_some_records(i, step)
 
+            if rows:
+                for row in rows:
+                    yield row
+                i = i + step
+            else:
+                break
 
     def url_from_row(self, row):
         """TODO: Docstring for generate_url_from_row.
@@ -46,7 +59,7 @@ class DbSpider(Spider):
 
         """
 
-        for row in self.query_records():
+        for row in self._query_records():
             yield Request(self.url_from_row(row), callback=self.parse, meta={'row': row}) # do something with rows from database
 
 

@@ -10,7 +10,7 @@ class MemberSpider(CookieSpider, DbSpider):
     request_url_tmpl = 'http://tieba.baidu.com/bawu2/platform/listMemberInfo?word=%s&ie=utf-8&pn=%s'
     name = 'member'
 
-    def query_records(self, start_index = 0, num = 50):
+    def query_some_records(self, start_index = 0, num = 50):
         """TODO: Docstring for query_records.
 
         :start_index: TODO
@@ -18,14 +18,9 @@ class MemberSpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
-        while True:
-            cursor = self.conn.cursor()
-            cursor.execute("""SELECT user_name from user_manage_tieba limit %s, %s""", (start_index, num))
-            rows = cursor.fetchall()
-
-            if rows:
-                for row in rows:
-                    yield row
+        cursor = self.conn.cursor()
+        cursor.execute("""SELECT user_name from user_manage_tieba limit %s, %s""", (start_index, num))
+        return cursor.fetchall()
 
     def url_from_row(self, row):
         return self.request_url_tmpl % (row[0], 1)
