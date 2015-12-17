@@ -3,6 +3,7 @@
 from cookieSpider import CookieSpider
 from dbSpider import DbSpider
 from scrapy import Request, Selector
+from dirbot.items import UserFollowTiebaRel
 import logging
 
 class MemberSpider(CookieSpider, DbSpider):
@@ -19,19 +20,44 @@ class MemberSpider(CookieSpider, DbSpider):
 
         """
         cursor = self.conn.cursor()
-        cursor.execute("""SELECT user_name from user_manage_tieba limit %s, %s""", (start_index, num))
+        cursor.execute("""SELECT name from tieba limit %s, %s""", (start_index, num))
         return cursor.fetchall()
 
     def url_from_row(self, row):
         return self.request_url_tmpl % (row[0], 1)
+    def next_page(self, response):
+        """TODO: Docstring for next_page.
 
-    def parse(self, response):
+        :response: TODO
+        :returns: TODO
+
+        """
+        return None
+
+    def empty_page(self, response):
+        """TODO: Docstring for empty_page.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+        return False
+
+    def parse_page(self, response):
         """TODO: Docstring for parse.
 
         :response: TODO
         :returns: TODO
 
         """
-        pass
+        items = []
+        for user_name in Selector(response).css('.user_name::attr(title)').extract():
+            item = UserFollowTiebaRel()
+            item['user_name'] = user_name
+            item['tieba_name'] = response.meta['row'][0] #tieba_name
+            logging.debug('meta: %r' % (response.meta))
+            items.append(item)
+
+        return items
 
 

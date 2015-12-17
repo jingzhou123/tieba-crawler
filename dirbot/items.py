@@ -43,5 +43,9 @@ class Comment(Item):
     post_time = Field()
     reply_id = Field()# 记录是哪个回复评论
 
+class UserFollowTiebaRel(Item):
+    user_name = Field()
+    tieba_name = Field()
+
 
 

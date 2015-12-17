@@ -20,6 +20,24 @@ class DbSpider(Spider):
         )
         self.conn = MySQLdb.connect(**dbargs)
 
+    def empty_page(self, response):
+        """TODO: Docstring for empty_page.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+        return False
+
+    def next_page(self, response):
+        """TODO: Docstring for next_page.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+        return False
+
     def query_some_records(self, start_index = 0, num = 50):
         """TODO: Docstring for query_some_records.
 
@@ -61,6 +79,24 @@ class DbSpider(Spider):
 
         for row in self._query_records():
             yield Request(self.url_from_row(row), callback=self.parse, meta={'row': row}) # do something with rows from database
+
+    def parse(self, response):
+        """TODO: Docstring for parse.
+
+        :response: TODO
+        :returns: TODO
+
+        """
+
+        if self.empty_page(response):
+            return
+
+        for item in self.parse_page(response):
+            yield item
+
+        next_page_url = self.next_page(response)
+        if next_page_url:
+            yield Request(next_page_url, callback=self.parse_page, meta={'row': response.meta['row']})
 
 
 
