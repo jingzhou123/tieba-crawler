@@ -55,9 +55,9 @@ create table if not exists tieba (
 )default charset=utf8;
 
 create table if not exists user_follow_tieba (
-    user_id int not null,
-    tieba_id int not null,
-    primary key (user_id, tieba_id)
+    user_name char(128) not null,
+    tieba_name char(128) not null,
+    primary key (user_name, tieba_name)
 )default charset=utf8;
 
 create table if not exists user_manage_tieba (

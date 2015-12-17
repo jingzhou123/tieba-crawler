@@ -15,6 +15,47 @@ class TbBasePipeline(object):
     def noop(self):
         pass
 
+    def target_spider_name(self):
+        """TODO: Docstring for target_spider_name.
+        :returns: TODO
+
+        """
+        return None
+
+    def do_upsert(self, conn, item, spider):
+        """跟数据库有关的操作.
+
+        :conn: TODO
+        :item: TODO
+        :spider: TODO
+        :returns: TODO
+
+        """
+        return item
+
+    def process_item(self, item, spider):
+        """TODO: Docstring for process_item.
+
+        :conn: TODO
+        :item: TODO
+        :spider: TODO
+        :returns: TODO
+
+        """
+        if self.target_spider_name() and self.target_spider_name() != spider.name:
+            return item
+
+        # run db query in the thread pool
+        d = self.dbpool.runInteraction(self.do_upsert, item, spider)
+        d.addErrback(self._handle_error, item, spider)
+        # at the end return the item in case of success or failure
+        d.addBoth(lambda _: item)
+        # return the deferred instead the item. This makes the engine to
+        # process next item (according to CONCURRENT_ITEMS setting) after this
+        # operation (deferred) has finished.
+        return d
+
+
     def _handle_error(self, failure, item, spider):
         """Handle occurred on db interaction."""
         # do nothing, just log
@@ -244,4 +285,25 @@ class CommentPipeline(TbBasePipeline):
 
         return d
 
+class MemberPipeline(TbBasePipeline):
+    def target_spider_name(self):
+        """用户关注的贴吧.
+        :returns: TODO
 
+        """
+
+        return 'member'
+
+    def do_upsert(self, conn, item, spider):
+        """TODO: Docstring for do_upsert.
+
+        :conn: TODO
+        :item: TODO
+        :spider: TODO
+        :returns: TODO
+
+        """
+        try:
+            conn.execute("""INSERT INTO user_follow_tieba values(%s, %s)""", (item['user_name'], item['tieba_name']));
+        except Exception, e:
+            pass # 如果重复就忽略

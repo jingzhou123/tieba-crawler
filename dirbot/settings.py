@@ -9,7 +9,8 @@ ITEM_PIPELINES = {
     'dirbot.pipelines.TiebaPipeline': 100,
     'dirbot.pipelines.PostPipeline': 200,
     'dirbot.pipelines.ReplyPipeline': 300,
-    'dirbot.pipelines.CommentPipeline': 400
+    'dirbot.pipelines.CommentPipeline': 400,
+    'dirbot.pipelines.MemberPipeline': 500
 }
 
 DOWNLOAD_DELAY = 1
