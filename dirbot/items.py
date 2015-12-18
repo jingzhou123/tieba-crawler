@@ -47,5 +47,16 @@ class UserFollowTiebaRel(Item):
     user_name = Field()
     tieba_name = Field()
 
+class User(Item):
+    id = Field()
+    name = Field()
+    admin_type = Field()
+    following_num = Field()
+    followed_num = Field()
+    following_tieba_name_array = Field()
+    tieba_age = Field()
+    posts_num = Field()
+
+
 
 

@@ -303,7 +303,14 @@ class MemberPipeline(TbBasePipeline):
         :returns: TODO
 
         """
-        try:
-            conn.execute("""INSERT INTO user_follow_tieba values(%s, %s)""", (item['user_name'], item['tieba_name']));
-        except Exception, e:
-            pass # 如果重复就忽略
+        conn.execute("""INSERT INTO user_follow_tieba values(%s, %s)""", (item['user_name'], item['tieba_name']));
+
+class UserAsMemberPipeline(TbBasePipeline):
+
+    """Docstring for UserAsMemberPipeline. """
+
+    def target_spider_name(self):
+        return 'user_member'
+
+    def do_upsert(self, conn, item, spider):
+        conn.execute("""UPDATE user SET following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s""", ())#吧龄 (x)x.x年 发贴数: x万
