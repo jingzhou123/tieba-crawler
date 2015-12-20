@@ -30,7 +30,7 @@ class UserMemberSpider(CookieSpider, DbSpider):
         """
 
         cursor = self.conn.cursor()
-        cursor.execute("""SELECT user_name from user_follow_tieba limit %s, %s""", (start_index, num))
+        cursor.execute("""SELECT DISTINCT user_name from user_follow_tieba limit %s, %s""", (start_index, num))# 去重
         return cursor.fetchall()
 
     def url_from_row(self, row):
@@ -54,7 +54,7 @@ class UserMemberSpider(CookieSpider, DbSpider):
         item['posts_num'] = self._parse_user_posts_num(response)
         item['following_tieba_name_array'] = self._parse_user_following_tieba(response)
         item['name'] = response.meta['row'][0]
-        item['id'] = self._parse_user_id(response)
+        item['baidu_id'] = self._parse_user_id(response)
         item = self._parse_following_and_followed(response, item)
 
         yield item
@@ -77,9 +77,9 @@ class UserMemberSpider(CookieSpider, DbSpider):
             if -1 == index:
                 return uri_to_fix
             else:
-                return uri_to_fix[1:index]
+                return uri_to_fix[0:index]
         else:
-            return None
+            return ''
 
     def _parse_following_and_followed(self, response, item):
         """TODO: Docstring for _parse_following_and_followed.

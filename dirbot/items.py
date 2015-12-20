@@ -49,6 +49,7 @@ class UserFollowTiebaRel(Item):
 
 class User(Item):
     id = Field()
+    baidu_id = Field()
     name = Field()
     admin_type = Field()
     following_num = Field()

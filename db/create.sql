@@ -3,6 +3,7 @@ use tieba;
 
 create table if not exists user (
     id int not null auto_increment,
+    baidu_id binary(32) default '',
     name char(128) not null unique,
     admin_type enum('none', 'admin', 'little_admin', 'img_admin') default 'none',
     following_num smallint default 0,

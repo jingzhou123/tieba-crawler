@@ -315,8 +315,8 @@ class UserAsMemberPipeline(TbBasePipeline):
 
     def do_upsert(self, conn, item, spider):
         try:
-            conn.execute("""INSERT INTO user SET following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s, name=%s""", (
-                item['following_num'], item['followed_num'], item['tieba_age'], item['posts_num'], item['name']))#吧龄 (x)x.x年 发贴数: x万 or 1234
+            conn.execute("""INSERT INTO user SET following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s, name=%s, baidu_id=%s""", (
+                item['following_num'], item['followed_num'], item['tieba_age'], item['posts_num'], item['name'], item['baidu_id']))#吧龄 (x)x.x年 发贴数: x万 or 1234
         except _mysql_exceptions.IntegrityError, e:# 有重复项，在某次已经爬下来
             pass
 
