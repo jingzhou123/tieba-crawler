@@ -2,8 +2,10 @@
 
 from cookieSpider import CookieSpider
 from dbSpider import DbSpider
-from scrapy import Request, Selector
 from dirbot.items import User
+
+from scrapy import Request, Selector
+from urlparse import urlparse, parse_qs
 import logging
 import json
 
@@ -52,9 +54,32 @@ class UserMemberSpider(CookieSpider, DbSpider):
         item['posts_num'] = self._parse_user_posts_num(response)
         item['following_tieba_name_array'] = self._parse_user_following_tieba(response)
         item['name'] = response.meta['row'][0]
+        item['id'] = self._parse_user_id(response)
         item = self._parse_following_and_followed(response, item)
 
         yield item
+
+    def _parse_user_id(self, response):
+        """TODO: Docstring for _parse_user_id.
+
+        :response: TODO
+        :returns: 32 digits user id hex
+
+        """
+
+        uri = Selector(response).css('.concern_num a::attr(href)').extract_first()
+        logging.debug('user id href: %s' % (uri))
+        if uri:
+            query_dict = parse_qs(urlparse(uri).query)
+            # uri maybe this: /home/concern?id=a3e3474fbda1bfb5bfecc0d6d121?t=1423636759&fr=home
+            uri_to_fix = query_dict['id'][0]# http://stackoverflow.com/questions/11280948/best-way-to-get-query-string-from-a-url-in-python
+            index = uri_to_fix.find('?')
+            if -1 == index:
+                return uri_to_fix
+            else:
+                return uri_to_fix[1:index]
+        else:
+            return None
 
     def _parse_following_and_followed(self, response, item):
         """TODO: Docstring for _parse_following_and_followed.
