@@ -2,6 +2,7 @@
 from scrapy.exceptions import DropItem
 from twisted.enterprise import adbapi
 import logging
+import _mysql_exceptions
 
 import sys
 reload(sys)
@@ -313,9 +314,18 @@ class UserAsMemberPipeline(TbBasePipeline):
         return 'user_member'
 
     def do_upsert(self, conn, item, spider):
-        conn.execute("""UPDATE user SET following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s""", ())#吧龄 (x)x.x年 发贴数: x万
+        try:
+            conn.execute("""INSERT INTO user SET following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s, name=%s""", (
+                item['following_num'], item['followed_num'], item['tieba_age'], item['posts_num'], item['name']))#吧龄 (x)x.x年 发贴数: x万 or 1234
+        except _mysql_exceptions.IntegrityError, e:# 有重复项，在某次已经爬下来
+            pass
+
         query_items = []
         for tieba_name in item['following_tieba_name_array']:
+            logging.debug('user: %r' % (item))
             query_items.append((item['name'], tieba_name))
 
-        #conn.executemany("""INSERT INOT user_follow_tieba VALUES (%s, %s)""", query_items)#吧龄 (x)x.x年 发贴数: x万
+        try:
+            conn.executemany("""INSERT INTO user_follow_tieba VALUES (%s, %s)""", query_items)
+        except _mysql_exceptions.IntegrityError, e:# 有重复项，说明是已经存在的关系，例如贴吧的会员
+            pass# 什么也不做

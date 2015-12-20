@@ -51,6 +51,7 @@ class UserMemberSpider(CookieSpider, DbSpider):
         item['tieba_age'] = self._parse_user_age(response)
         item['posts_num'] = self._parse_user_posts_num(response)
         item['following_tieba_name_array'] = self._parse_user_following_tieba(response)
+        item['name'] = response.meta['row'][0]
         item = self._parse_following_and_followed(response, item)
 
         yield item
