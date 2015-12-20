@@ -7,7 +7,7 @@ create table if not exists user (
     admin_type enum('none', 'admin', 'little_admin', 'img_admin') default 'none',
     following_num smallint default 0,
     followed_num smallint default 0,
-    tieba_age tinyint default 0,
+    tieba_age float default 0,
     posts_num int default 0,
     primary key (id)
 )default charset=utf8;

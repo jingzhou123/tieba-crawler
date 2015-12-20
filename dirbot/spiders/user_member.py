@@ -102,7 +102,7 @@ class UserMemberSpider(CookieSpider, DbSpider):
 
         """
 
-        return Selector(response).css('.userinfo_userdata span:nth-child(2)::text').extract_first()[3:-1]# 吧龄:(X)X.X年
+        return Selector(response).css('.userinfo_userdata span:nth-child(2)::text').extract_first()[3:-1] or 0# 吧龄:(X)X.X年
 
     def _parse_user_posts_num(self, response):
         """TODO: Docstring for _parse_user_posts_num.
@@ -111,5 +111,10 @@ class UserMemberSpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
-        return Selector(response).css('.userinfo_userdata span:nth-child(4)::text').extract_first()[3:-1]# 发贴:(X)X.X万
+        num = Selector(response).css('.userinfo_userdata span:nth-child(4)::text').extract_first()[3:-1]# 发贴:(X)X.X万
+        logging.debug('posts num: %s' % (num))
+        if num:
+            return num if num.find('.') != -1 else float(num) * 10000
+        else:
+            return 0
 
