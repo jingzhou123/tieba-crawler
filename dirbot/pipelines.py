@@ -314,3 +314,8 @@ class UserAsMemberPipeline(TbBasePipeline):
 
     def do_upsert(self, conn, item, spider):
         conn.execute("""UPDATE user SET following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s""", ())#吧龄 (x)x.x年 发贴数: x万
+        query_items = []
+        for tieba_name in item['following_tieba_name_array']:
+            query_items.append((item['name'], tieba_name))
+
+        #conn.executemany("""INSERT INOT user_follow_tieba VALUES (%s, %s)""", query_items)#吧龄 (x)x.x年 发贴数: x万
