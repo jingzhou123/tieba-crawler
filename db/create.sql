@@ -24,6 +24,7 @@ create table if not exists comment (
 
 create table if not exists post (
     id bigint not null,
+    author_id bigint not null,
     author_name char(128) not null,
     tieba_name char(128) not null,
     title char(128) not null,
@@ -37,6 +38,7 @@ create table if not exists reply (
     author_name char(128) not null,
     body text,
     id bigint not null,
+    author_id bigint not null,
     title char(128) not null,
     post_time datetime,
     post_id bigint not null,

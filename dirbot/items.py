@@ -30,6 +30,7 @@ class Reply(Item):
     author_name = Field()
     body = Field()
     id = Field()
+    author_id = Field()
     post_time = Field()
     reply_num = Field()
     title = Field()

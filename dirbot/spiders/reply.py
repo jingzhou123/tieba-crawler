@@ -47,6 +47,11 @@ class ReplySpider(CookieSpider, DbSpider):
         item['id'] = json.loads(post.css('::attr(data-field)').extract_first())['content']['post_id']# 百度给出的一条评论的id
         item['post_id'] = response.meta['post_id']
         item['author_name'] = post.css('.d_name a::text').extract_first()
+        item['author_id'] = json.loads(
+            post
+            .css('.d_name::attr(data-field)')
+            .extract_first()
+        )['user_id']
         item['type'] = None
         item['reply_num'] = self._parse_reply_num(post)
 
