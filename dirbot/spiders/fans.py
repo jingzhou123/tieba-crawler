@@ -30,7 +30,7 @@ class FanSpider(CookieSpider, DbSpider):
         cursor = self.conn.cursor()
         # baidu_id: 用户的百度16字节id
         cursor.execute("""
-            SELECT baidu_id from user limit %s, %s
+            SELECT baidu_id, name from user limit %s, %s
         """, (
             start_index,
             num
@@ -69,6 +69,7 @@ class FanSpider(CookieSpider, DbSpider):
             item = Fan()
             item['name'] = sel.css('.name a::text').extract_first()
             item['baidu_id'] = sel.css('::attr(portrait)').extract_first()
+            item['user_name_followed'] = response.meta['row'][1]# 是谁的粉丝
 
             yield item
 

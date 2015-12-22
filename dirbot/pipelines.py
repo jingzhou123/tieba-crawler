@@ -360,10 +360,21 @@ class FanPipeline(TbBasePipeline):
         return 'fan'
 
     def do_upsert(self, conn, item, spider):
+        try:
+            conn.execute("""
+                INSERT INTO fan SET name=%s, baidu_id=%s
+            """, (
+                item['name'],
+                item['baidu_id']
+            ))
+        except Exception, e:
+            logging.debug(e)
+
+
         conn.execute("""
-            INSERT INTO fan SET name=%s, baidu_id=%s
+            INSERT INTO user_follow_user SET to_user_name=%s, from_user_name=%s
         """, (
-            item['name'],
-            item['baidu_id']
+            item['user_name_followed'],
+            item['name']
         ))
 

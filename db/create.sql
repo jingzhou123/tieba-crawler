@@ -80,9 +80,9 @@ create table if not exists user_manage_tieba (
 )default charset=utf8;
 
 create table if not exists user_follow_user (
-    from_user_id int not null,
-    to_user_id int not null,
-    primary key (from_user_id, to_user_id)
+    from_user_name char(128) not null,
+    to_user_name char(128) not null,
+    primary key (from_user_name, to_user_name)
 )default charset=utf8;
 
 create table if not exists user_followed_user (

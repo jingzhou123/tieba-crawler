@@ -59,7 +59,7 @@ class User(Item):
     posts_num = Field()
 
 class Fan(User):
-    id = Field()
+    user_name_followed = Field()
 
 
 
