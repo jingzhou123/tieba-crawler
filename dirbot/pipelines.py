@@ -351,3 +351,19 @@ class UserAsMemberPipeline(TbBasePipeline):
             conn.executemany("""INSERT INTO user_follow_tieba VALUES (%s, %s)""", query_items)
         except _mysql_exceptions.IntegrityError, e:# 有重复项，说明是已经存在的关系，例如贴吧的会员
             pass# 什么也不做
+
+class FanPipeline(TbBasePipeline):
+
+    """Docstring for FanPipeline. """
+
+    def target_spider_name(self):
+        return 'fan'
+
+    def do_upsert(self, conn, item, spider):
+        conn.execute("""
+            INSERT INTO fan SET name=%s, baidu_id=%s
+        """, (
+            item['name'],
+            item['baidu_id']
+        ))
+

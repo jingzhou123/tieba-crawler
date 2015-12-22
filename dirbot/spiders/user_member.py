@@ -30,7 +30,12 @@ class UserMemberSpider(CookieSpider, DbSpider):
         """
 
         cursor = self.conn.cursor()
-        cursor.execute("""SELECT DISTINCT user_name from user_follow_tieba limit %s, %s""", (start_index, num))# 去重
+        cursor.execute("""
+            SELECT DISTINCT user_name from user_follow_tieba limit %s, %s
+        """, (
+            start_index,
+            num
+        ))# 去重
         return cursor.fetchall()
 
     def url_from_row(self, row):
@@ -72,12 +77,7 @@ class UserMemberSpider(CookieSpider, DbSpider):
         if uri:
             query_dict = parse_qs(urlparse(uri).query)
             # uri maybe this: /home/concern?id=a3e3474fbda1bfb5bfecc0d6d121?t=1423636759&fr=home
-            uri_to_fix = query_dict['id'][0]# http://stackoverflow.com/questions/11280948/best-way-to-get-query-string-from-a-url-in-python
-            index = uri_to_fix.find('?')
-            if -1 == index:
-                return uri_to_fix
-            else:
-                return uri_to_fix[0:index]
+            return query_dict['id'][0]
         else:
             return ''
 

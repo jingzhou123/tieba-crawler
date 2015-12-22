@@ -58,6 +58,10 @@ class User(Item):
     tieba_age = Field()
     posts_num = Field()
 
+class Fan(User):
+    id = Field()
+
+
 
 
 

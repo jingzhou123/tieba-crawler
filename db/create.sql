@@ -13,6 +13,18 @@ create table if not exists user (
     primary key (id)
 )default charset=utf8;
 
+create table if not exists fan (
+    id int not null auto_increment,
+    baidu_id binary(32) default '',
+    name char(128) not null unique,
+    admin_type enum('none', 'admin', 'little_admin', 'img_admin') default 'none',
+    following_num smallint default 0,
+    followed_num smallint default 0,
+    tieba_age float default 0,
+    posts_num int default 0,
+    primary key (id)
+)default charset=utf8;
+
 create table if not exists comment (
     id bigint not null,
     reply_id bigint not null,
