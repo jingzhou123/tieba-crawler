@@ -197,13 +197,19 @@ class PostPipeline(TbBasePipeline):
         logging.debug('filtered ads...')
 
         item = self._fill_in_data(item)
-        conn.execute(
-            """INSERT INTO post values(%s, %s, %s, %s, %s, %s, %s)
-               ON DUPLICATE KEY UPDATE author_name=%s, tieba_name=%s, title=%s, body=%s, post_time=%s, reply_num=%s""",
+        conn.execute( """
+            INSERT INTO post SET
+            author_name=%s, tieba_name=%s, title=%s,
+            body=%s, post_time=%s, reply_num=%s, id=%s
+       """,
             (
-                item['id'], item['author_name'], item['tieba_name'], item['title'], item['body'], item['post_time'], item['reply_num'],
-                #values to update
-                item['author_name'], item['tieba_name'], item['title'], item['body'], item['post_time'], item['reply_num']
+                item['author_name'],
+                item['tieba_name'],
+                item['title'],
+                item['body'],
+                item['post_time'],
+                item['reply_num'],
+                item['id']
             )
         )
 
@@ -225,13 +231,29 @@ class ReplyPipeline(TbBasePipeline):
 
         """
         if item['type'] == 'MAIN':
-            #conn.execute("""UPDATE post SET title=%s, body=%s, post_time=%s where id=%s""", (item['title'], item['body'], item['post_time'], item['id']))
-            pass
+            conn.execute("""
+                UPDATE post SET title=%s, body=%s, post_time=%s where id=%s
+            """, (
+                item['title'],
+                item['body'],
+                item['post_time'],
+                item['id'])
+            )
         else:
             logging.debug('item id: %s' % (item['id']))
-            #conn.execute("""INSERT INTO reply SET title=%s, author_name=%s, body=%s, post_time=%s, id=%s, post_id=%s""", (item['title'], item['author_name'], item['body'], item['post_time'], item['id'], item['post_id']))
-            #logging.debug("""INSERT INTO reply values(%s, %s, %s, %s, %s, %s, %s, %s)""" % (item['author_name'], item['body'], item['id'], '天', item['title'], item['post_time'], item['post_id'], ''))
-            conn.execute("""INSERT INTO reply values(%s, %s, %s, %s, %s, %s, %s)""", (item['author_name'], item['body'], item['id'], item['title'], item['post_time'], item['post_id'], item['reply_num']))
+            conn.execute("""
+                INSERT INTO reply SET
+                author_name=%s, body=%s, id=%s, title = %s,
+                post_time=%s, post_id=%s, reply_num=%s
+            """, (
+                item['author_name'],
+                item['body'],
+                item['id'],
+                item['title'],
+                item['post_time'],
+                item['post_id'],
+                item['reply_num'],
+            ))
 
     def process_item(self, item, spider):
         if spider.name != 'reply':
