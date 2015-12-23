@@ -378,3 +378,27 @@ class FanPipeline(TbBasePipeline):
             item['name']
         ))
 
+class FollowPipeline(TbBasePipeline):
+
+    """Docstring for FanPipeline. """
+
+    def target_spider_name(self):
+        return 'follow'
+
+    def do_upsert(self, conn, item, spider):
+        conn.execute("""
+            INSERT INTO follow SET name=%s, baidu_id=%s
+        """, (
+            item['name'],
+            item['baidu_id']
+        ))
+
+
+        conn.execute("""
+            INSERT INTO user_followed_user SET
+            to_user_name=%s, from_user_name=%s
+        """, (
+            item['user_name_following'],
+            item['name']
+        ))
+

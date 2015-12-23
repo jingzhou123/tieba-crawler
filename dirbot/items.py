@@ -61,6 +61,9 @@ class User(Item):
 class Fan(User):
     user_name_followed = Field()
 
+class Follow(User):
+    user_name_following = Field()
+
 
 
 
