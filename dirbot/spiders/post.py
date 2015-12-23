@@ -63,8 +63,14 @@ class PostSpider(Spider):
             logging.debug('帖子：%r' % (item))
 
             yield item
+    def should_stop(self, item):
+        """stop crawl if possible, can be inheritted
 
+        :item: TODO
+        :returns: TODO
 
+        """
+        return False
 
     def parse(self, response):
         """TODO: Docstring for pass.
@@ -74,7 +80,10 @@ class PostSpider(Spider):
 
         """
         for item in self._parse_posts(response):
-            yield item
+            if not self.should_stop(item):
+                yield item
+            else:
+                return
 
         if len(Selector(response).css('#frs_list_pager .next')):
             #贴吧的分页有的不是完整的链接
