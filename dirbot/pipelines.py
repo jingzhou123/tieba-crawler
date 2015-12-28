@@ -370,6 +370,23 @@ class UserAsFanPipeline(TbBasePipeline):
             item['name']
         ))#吧龄 (x)x.x年 发贴数: x万 or 1234
 
+class UserPipeline(TbBasePipeline):
+
+    """Docstring for UserAsMemberPipeline. """
+
+    def do_upsert(self, conn, item, spider):
+        conn.execute("""
+            INSERT INTO user SET
+            following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s, baidu_id=%s, name=%s
+        """, (
+            item['following_num'],
+            item['followed_num'],
+            item['tieba_age'],
+            item['posts_num'],
+            item['baidu_id'],
+            item['name']
+        ))
+
 class UserAsMemberPipeline(TbBasePipeline):
 
     """Docstring for UserAsMemberPipeline. """

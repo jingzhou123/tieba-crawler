@@ -15,7 +15,8 @@ ITEM_PIPELINES = {
     'dirbot.pipelines.FanPipeline': 700,
     'dirbot.pipelines.FollowPipeline': 800,
     'dirbot.pipelines.UserAsFollowPipeline': 850,
-    'dirbot.pipelines.UserAsFanPipeline': 860
+    'dirbot.pipelines.UserAsFanPipeline': 860,
+    'dirbot.pipelines.UserPipeline': 870
 }
 
 DOWNLOAD_DELAY = 1
@@ -34,5 +35,6 @@ MYSQL_USER = 'root'
 MYSQL_PASSWD = 'q'
 #贴吧名称列表
 TIEBA_NAMES_LIST = [
-    '心理',
+    #'心理',
+    '广东',
 ]
