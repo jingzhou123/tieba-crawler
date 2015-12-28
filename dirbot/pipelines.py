@@ -328,6 +328,48 @@ class MemberPipeline(TbBasePipeline):
         """
         conn.execute("""INSERT INTO user_follow_tieba values(%s, %s)""", (item['user_name'], item['tieba_name']));
 
+class UserAsFollowPipeline(TbBasePipeline):
+
+    """Docstring for UserAsMemberPipeline. """
+
+    def target_spider_name(self):
+        return 'user_follow'
+
+    def do_upsert(self, conn, item, spider):
+        conn.execute("""
+            UPDATE follow SET
+            following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s, baidu_id=%s
+            where name=%s
+        """, (
+            item['following_num'],
+            item['followed_num'],
+            item['tieba_age'],
+            item['posts_num'],
+            item['baidu_id'],
+            item['name']
+        ))#吧龄 (x)x.x年 发贴数: x万 or 1234
+
+class UserAsFanPipeline(TbBasePipeline):
+
+    """Docstring for UserAsMemberPipeline. """
+
+    def target_spider_name(self):
+        return 'user_fan'
+
+    def do_upsert(self, conn, item, spider):
+        conn.execute("""
+            UPDATE fan SET
+            following_num=%s, followed_num=%s, tieba_age=%s, posts_num=%s, baidu_id=%s
+            where name=%s
+        """, (
+            item['following_num'],
+            item['followed_num'],
+            item['tieba_age'],
+            item['posts_num'],
+            item['baidu_id'],
+            item['name']
+        ))#吧龄 (x)x.x年 发贴数: x万 or 1234
+
 class UserAsMemberPipeline(TbBasePipeline):
 
     """Docstring for UserAsMemberPipeline. """

@@ -8,10 +8,10 @@ from urlparse import urlparse, parse_qs
 import logging
 import json
 
-class UserMemberSpider(UserSpider):
+class UserFollowSpider(UserSpider):
 
     """Docstring for UserSpider. """
-    name = 'user_member'# 命名规则 user_{从哪种渠道获得的用户名称}
+    name = 'user_follow'# 命名规则 user_{从哪种渠道获得的用户名称}
 
     def query_some_records(self, start_index = 0, num = 50):
         """TODO: Docstring for query_some_records.
@@ -24,7 +24,7 @@ class UserMemberSpider(UserSpider):
 
         cursor = self.conn.cursor()
         cursor.execute("""
-            SELECT DISTINCT user_name from user_follow_tieba limit %s, %s
+            SELECT name from follow limit %s, %s
         """, (
             start_index,
             num

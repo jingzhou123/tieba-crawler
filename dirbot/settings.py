@@ -13,7 +13,9 @@ ITEM_PIPELINES = {
     'dirbot.pipelines.MemberPipeline': 500,
     'dirbot.pipelines.UserAsMemberPipeline': 600,
     'dirbot.pipelines.FanPipeline': 700,
-    'dirbot.pipelines.FollowPipeline': 800
+    'dirbot.pipelines.FollowPipeline': 800,
+    'dirbot.pipelines.UserAsFollowPipeline': 850,
+    'dirbot.pipelines.UserAsFanPipeline': 860
 }
 
 DOWNLOAD_DELAY = 1
