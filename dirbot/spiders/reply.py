@@ -84,7 +84,7 @@ class ReplySpider(CookieSpider, DbSpider):
         item = Reply()
         #拼接字符串
         item['body'] = ''.join(post.css('cc div::text').extract()).strip()
-        item['title'] = Selector(response).css('h3.core_title_txt::text').extract_first()
+        item['title'] = Selector(response).css('.core_title_txt::text').extract_first()
         item['post_time'] = self._fill_time(
             post
             .css('.post-tail-wrap span.tail-info:last-child::text')
