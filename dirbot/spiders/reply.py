@@ -68,7 +68,7 @@ class ReplySpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
-        if len(time) <= len('YYYY-MM-DD'):
+        if time and len(time) <= len('YYYY-MM-DD'):
             return  time + ' 00:00:00'
         else:
             return time
@@ -85,7 +85,13 @@ class ReplySpider(CookieSpider, DbSpider):
         #拼接字符串
         item['body'] = ''.join(post.css('cc div::text').extract()).strip()
         item['title'] = Selector(response).css('h3.core_title_txt::text').extract_first()
-        item['post_time'] = self._fill_time(post.css('.post-tail-wrap span.tail-info:last-child::text').extract_first())
+        item['post_time'] = self._fill_time(
+            post
+            .css('.post-tail-wrap span.tail-info:last-child::text')
+            .extract_first() or
+            post.css('.p_tail li:last-child span')
+            .extract_first()# fix 广东吧
+        )
         #TODO: time
 
         return item;
