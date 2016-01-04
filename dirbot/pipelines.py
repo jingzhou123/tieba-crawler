@@ -43,9 +43,15 @@ class TbBasePipeline(object):
         :returns: TODO
 
         """
-        if self.target_spider_name() and self.target_spider_name() != spider.name:
-            return item
+        names_or_name_str = self.target_spider_name();
 
+        if isinstance(names_or_name_str, str) and names_or_name_str != spider.name:
+            return item
+        if isinstance(names_or_name_str, list):
+            for name in names_or_name_str:
+                if name == spider.name:
+                    break
+            return item
         # run db query in the thread pool
         d = self.dbpool.runInteraction(self.do_upsert, item, spider)
         d.addErrback(self._handle_error, item, spider)
@@ -373,6 +379,12 @@ class UserAsFanPipeline(TbBasePipeline):
 class UserPipeline(TbBasePipeline):
 
     """Docstring for UserAsMemberPipeline. """
+    def target_spider_name(self):
+        """TODO: Docstring for target_spider_name.
+        :returns: TODO
+
+        """
+        return ['user_member', 'user_fan', 'user_follow']
 
     def do_upsert(self, conn, item, spider):
         conn.execute("""
