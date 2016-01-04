@@ -22,7 +22,7 @@ class CommentSpider(CookieSpider, DbSpider):
 
         """
         cursor = self.conn.cursor()
-        cursor.execute("""SELECT id, post_id from reply limit %s, %s""", (start_index, num))
+        cursor.execute("""SELECT id, post_id, reply_num from reply limit %s, %s""", (start_index, num))
         return cursor.fetchall()
 
     def _parse_page(self, response):
@@ -108,9 +108,15 @@ class CommentSpider(CookieSpider, DbSpider):
                 for row in rows:
                     reply_id = row[0]
                     post_id = row[1]
-                    yield Request(self.request_url_tmpl % (post_id, reply_id, 1), # tid is 主贴的id, pid是回复的id
+                    reply_num = row[2]
+                    if reply_num != 0:
+                        yield Request(
+                            self.request_url_tmpl % (
+                                post_id, reply_id, 1
+                            ), # tid is 主贴的id, pid是回复的id
                             callback=self.parse,
-                            meta={'post_id': post_id, 'reply_id': reply_id, 'cur_page': 1})
+                            meta={'post_id': post_id, 'reply_id': reply_id, 'cur_page': 1}
+                        )
 
                 i = i + step
             else:
