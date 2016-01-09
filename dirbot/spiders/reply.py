@@ -23,18 +23,6 @@ class ReplySpider(CookieSpider, DbSpider):
         cursor.execute("""SELECT id from post limit %s, %s""", (start_index, num));
         return cursor.fetchall()
 
-    def _parse_reply_num(self, post):
-        """提取一个主贴的回复的评论数
-
-        :post: TODO
-        :returns: TODO
-
-        """
-        #return this "{"total_num": null_or_num}"
-        json_str = post.css('div.p_reply::attr(data-field)').extract_first()
-        #有的并没有这个div
-        return (json_str and json.loads(json_str)['total_num']) or 0
-
     def _parse_reply(self, post, response):
         """TODO: Docstring for _parse_reply.
 
@@ -42,13 +30,18 @@ class ReplySpider(CookieSpider, DbSpider):
         :returns: TODO
 
         """
+        json_data = json.loads(
+            post
+            .css('::attr(data-field)')
+            .extract_first()
+        )
         item = self._parse_general_post(post, response)
         #item['id'] = str(uuid().int>>64)[0:16]
-        item['id'] = json.loads(post.css('::attr(data-field)').extract_first())['content']['post_id']# 百度给出的一条评论的id
+        item['id'] = json_data['content']['post_id']# 百度给出的一条评论的id
         item['post_id'] = response.meta['post_id']
         item['author_name'] = post.css('.d_name a::text').extract_first()
         item['type'] = None
-        item['reply_num'] = self._parse_reply_num(post)
+        item['reply_num'] = json_data['content']['comment_num']
 
         return item
 
