@@ -47,20 +47,18 @@ class TbBasePipeline(object):
 
         if isinstance(names_or_name_str, str) and names_or_name_str != spider.name:
             return item
-        if isinstance(names_or_name_str, list):
-            for name in names_or_name_str:
-                if name == spider.name:
-                    break
+        if isinstance(names_or_name_str, list) and not spider.name in names_or_name_str:
             return item
-        # run db query in the thread pool
-        d = self.dbpool.runInteraction(self.do_upsert, item, spider)
-        d.addErrback(self._handle_error, item, spider)
-        # at the end return the item in case of success or failure
-        d.addBoth(lambda _: item)
-        # return the deferred instead the item. This makes the engine to
-        # process next item (according to CONCURRENT_ITEMS setting) after this
-        # operation (deferred) has finished.
-        return d
+        else:
+            # run db query in the thread pool
+            d = self.dbpool.runInteraction(self.do_upsert, item, spider)
+            d.addErrback(self._handle_error, item, spider)
+            # at the end return the item in case of success or failure
+            d.addBoth(lambda _: item)
+            # return the deferred instead the item. This makes the engine to
+            # process next item (according to CONCURRENT_ITEMS setting) after this
+            # operation (deferred) has finished.
+            return d
 
 
     def _handle_error(self, failure, item, spider):
@@ -384,7 +382,7 @@ class UserPipeline(TbBasePipeline):
         :returns: TODO
 
         """
-        return ['user_member', 'user_fan', 'user_follow']
+        return ['user_member', 'user_fan', 'user_follow', 'user_post', 'user_reply', 'user_comment']
 
     def do_upsert(self, conn, item, spider):
         conn.execute("""
