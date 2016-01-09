@@ -36,5 +36,6 @@ MYSQL_PASSWD = 'q'
 #贴吧名称列表
 TIEBA_NAMES_LIST = [
     #'心理',
-    '广东',
+    #'广东',
+    '中国电影',
 ]
