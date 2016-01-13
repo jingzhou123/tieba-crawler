@@ -4,9 +4,9 @@ from cookieSpider import CookieSpider
 from dbSpider import DbSpider
 from scrapy import Request, Selector
 from dirbot.items import Reply
+from dirbot.settings import TASK_TAG
 import logging
 import json
-from uuid import uuid1 as uuid
 
 class ReplySpider(CookieSpider, DbSpider):
 
@@ -20,7 +20,7 @@ class ReplySpider(CookieSpider, DbSpider):
         """
 
         cursor = self.conn.cursor()
-        cursor.execute("""SELECT id from post limit %s, %s""", (start_index, num));
+        cursor.execute("""SELECT id from post where tag='%s' limit %s, %s""" % (TASK_TAG, start_index, num));
         return cursor.fetchall()
 
     def _parse_reply(self, post, response):
@@ -42,6 +42,7 @@ class ReplySpider(CookieSpider, DbSpider):
         item['author_name'] = post.css('.d_name a::text').extract_first()
         item['type'] = None
         item['reply_num'] = json_data['content']['comment_num']
+        item['tag'] = TASK_TAG
 
         return item
 

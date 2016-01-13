@@ -239,7 +239,8 @@ class ReplyPipeline(TbBasePipeline):
             conn.execute("""
                 INSERT INTO reply SET
                 author_name=%s, body=%s, id=%s, title = %s,
-                post_time=%s, post_id=%s, reply_num=%s
+                post_time=%s, post_id=%s, reply_num=%s,
+                tag=%s
             """, (
                 item['author_name'],
                 item['body'],
@@ -248,6 +249,7 @@ class ReplyPipeline(TbBasePipeline):
                 item['post_time'],
                 item['post_id'],
                 item['reply_num'],
+                item['tag']
             ))
 
     def process_item(self, item, spider):
