@@ -25,6 +25,7 @@ class Post(Item):
     id = Field()
     post_time = Field()
     reply_num = Field()
+    tag = Field()
     tieba_name = Field()
     title = Field()
 

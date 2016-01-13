@@ -54,6 +54,8 @@ create table if not exists post (
     body text,
     post_time datetime,
     reply_num int default 0,
+    tag char(32) default '',
+    index tag (tag),
     primary key (id)
 )default charset=utf8;
 

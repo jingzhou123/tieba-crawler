@@ -193,7 +193,8 @@ class PostPipeline(TbBasePipeline):
         conn.execute( """
             INSERT INTO post SET
             author_name=%s, tieba_name=%s, title=%s,
-            body=%s, post_time=%s, reply_num=%s, id=%s
+            body=%s, post_time=%s, reply_num=%s, id=%s,
+            tag=%s
        """,
             (
                 item['author_name'],
@@ -202,7 +203,8 @@ class PostPipeline(TbBasePipeline):
                 item['body'],
                 item['post_time'],
                 item['reply_num'],
-                item['id']
+                item['id'],
+                item['tag']
             )
         )
 

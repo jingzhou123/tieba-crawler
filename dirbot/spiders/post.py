@@ -1,17 +1,19 @@
 #coding=utf-8
 from scrapy import Request
-from cookieSpider import CookieSpider as Spider
+from cookieSpider import CookieSpider
+from dbSpider import DbSpider
 from scrapy.selector import Selector
 from dirbot.settings import TIEBA_NAMES_LIST
+from dirbot.settings import TASK_TAG
 from dirbot.items import Post
 import logging
 
-class PostSpider(Spider):
+class PostSpider(CookieSpider, DbSpider):
 
     """Docstring for PostSpider. """
 
     name = 'post'
-    allowed_domains = ["baidu.com"]
+    request_url_tmpl = 'http://tieba.baidu.com/f?ie=utf-8&kw=%s'
 
     def _extract_post_id(self, href):# href = /p/123456789
         try:
@@ -19,18 +21,39 @@ class PostSpider(Spider):
         except Exception, e:
             return -1#没有ID的帖子就是广告，在pipeline里要过滤掉
 
-    def start_requests(self):
-        """TODO: Docstring for start_requests.
+    def parse_page(self, response):
+        """TODO: Docstring for parse_page.
+
+        :response: TODO
         :returns: TODO
 
         """
-        url_list = map(
-            lambda name: ("http://tieba.baidu.com/f?ie=utf-8&kw=" + name),
-            TIEBA_NAMES_LIST
-        )
+        return self._parse_posts(response);
 
-        for url in url_list:
-            yield Request(url, callback=self.parse)
+    def url_from_row(self, row):
+        """TODO: Docstring for url_from_row.
+
+        :row: TODO
+        :returns: TODO
+
+        """
+        return self.request_url_tmpl % (row[0])
+
+    def query_some_records(self, start_index = 0, num = 50):
+        """TODO: Docstring for query_some_records.
+
+        :start_index: TODO
+        :num: TODO
+        :returns: TODO
+
+        """
+        cursor = self.conn.cursor()
+        cursor.execute("""
+            SELECT name FROM tieba WHERE tag='%s'
+        """ %  (
+            TASK_TAG
+        ))# 去重
+        return cursor.fetchall()
 
     def _parse_posts(self, response):
         """TODO: Docstring for _parse_posts.
@@ -39,10 +62,9 @@ class PostSpider(Spider):
         :returns: TODO
 
         """
-        #logging.debug('parsing a post..')
-        tieba_name = Selector(response).css('.card_title_fname::text').extract_first().strip()[:-1]# XX吧 -> XX
+        items= []
+        tieba_name = response.meta['row'][0]
         post_item_sels = Selector(response).css('#thread_list>li')
-        #logging.debug('posts total num: %s', len(post_item_sels))
 
         for sel in post_item_sels:
             item = Post()
@@ -60,38 +82,24 @@ class PostSpider(Spider):
             else:
                 item['body'] = item['body'].strip()#去掉回车和空格
             #item['post_time'] = sel.css('') #这里拿不到发贴时间，只有最后回复时间
-            logging.debug('帖子：%r' % (item))
+            item['tag'] = TASK_TAG
+            items.append(item)
 
-            yield item
-    def should_stop(self, item):
-        """stop crawl if possible, can be inheritted
+        return items
 
-        :item: TODO
-        :returns: TODO
-
-        """
-        return False
-
-    def parse(self, response):
-        """TODO: Docstring for pass.
+    def next_page(self, response):
+        """TODO: Docstring for next_page.
 
         :response: TODO
         :returns: TODO
 
         """
-        for item in self._parse_posts(response):
-            if not self.should_stop(item):
-                yield item
-            else:
-                return
-
         if len(Selector(response).css('#frs_list_pager .next')):
             #贴吧的分页有的不是完整的链接
             next_page_url = Selector(response).css('#frs_list_pager .next::attr(href)').extract_first()
-            logging.debug('next_page_url %s', next_page_url)
             if -1 != next_page_url.find('http://tieba.baidu.com'):
-                yield Request(next_page_url, callback=self.parse)
+                return next_page_url
             else:
-                yield Request('http://tieba.baidu.com' + next_page_url, callback=self.parse)
-
-
+                return 'http://tieba.baidu.com' + next_page_url
+        else:
+            return False
