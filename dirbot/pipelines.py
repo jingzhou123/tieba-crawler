@@ -121,27 +121,16 @@ class TiebaPipeline(TbBasePipeline):
             """, (name, item['name'], name, item['name']))
 
     def _do_upsert(self, conn, item, spider):
-        logging.debug('processing item from posts..')
-        """Perform an insert or update."""
-        conn.execute("""SELECT EXISTS(
-            SELECT name FROM tieba WHERE name = %s
-        )""", (item['name'], ))
-        ret = conn.fetchone()[0]
-
-        if ret:
-            conn.execute("""
-                UPDATE tieba
-                SET followed_num=%s, belong_dir=%s, slogan=%s, posts_num=%s,admin_num=%s
-                WHERE name=%s
-            """, (item['members_num'], item['dir_name'], item['slogan'],
-                item['posts_num'], item['admin_num'], item['name'], ))
-        else:
-            conn.execute("""
-                INSERT INTO tieba VALUES (DEFAULT, %s, %s, %s, %s, %s, %s)
-            """, (
-                item['name'], item['members_num'], item['admin_num'],
-                item['posts_num'], item['slogan'], item['dir_name'],
-            ))
+        conn.execute("""
+            INSERT INTO tieba SET
+            name=%s, followed_num=%s,
+            admin_num=%s, posts_num=%s,
+            slogan=%s, belong_dir=%s, tag=%s
+        """, (
+            item['name'], item['members_num'],
+            item['admin_num'], item['posts_num'],
+            item['slogan'], item['dir_name'], item['tag']
+        ))
 
         self._insert_tieba_admins(conn, item, spider);
 

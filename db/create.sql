@@ -76,7 +76,9 @@ create table if not exists tieba (
     posts_num int default 0,
     slogan char(128) default '',
     belong_dir char(128) default '',
-    primary key (id)
+    tag char(32) default '',
+    primary key (id),
+    index tag (tag)
 )default charset=utf8;
 
 create table if not exists user_follow_tieba (

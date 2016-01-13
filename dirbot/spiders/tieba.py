@@ -7,6 +7,7 @@ from cookieSpider import CookieSpider as Spider
 from scrapy.selector import Selector
 from dirbot.items import Tieba
 from dirbot.settings import TIEBA_NAMES_LIST
+from dirbot.settings import TASK_TAG
 
 class TiebaSpider(Spider):
     name= "tieba"
@@ -124,6 +125,7 @@ class TiebaSpider(Spider):
         item['slogan'] = self.parse_slogan(response)
         item['dir_name'] = self.parse_dir_name(response)
         item['admin_names'] = self.parse_admin_users(response)
+        item['tag'] = TASK_TAG
 
         return item
 
