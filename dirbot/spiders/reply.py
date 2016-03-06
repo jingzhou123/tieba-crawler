@@ -20,7 +20,7 @@ class ReplySpider(CookieSpider, DbSpider):
         """
 
         cursor = self.conn.cursor()
-        cursor.execute("""SELECT id from post where tag='%s' limit %s, %s""" % (TASK_TAG, start_index, num));
+        cursor.execute("""SELECT id, reply_num from post where tag='%s' limit %s, %s""" % (TASK_TAG, start_index, num));
         return cursor.fetchall()
 
     def _parse_reply(self, post, response):
@@ -112,10 +112,14 @@ class ReplySpider(CookieSpider, DbSpider):
                 rows = self._query_posts(i, step)
                 if rows:
                     for row in rows:
-                        logging.debug("an post's id: %r" % row[0])
                         post_id = str(row[0])
-                        yield Request('http://tieba.baidu.com/p/' + post_id, callback=self.parse, meta={'post_id': post_id})
+                        reply_num = row[1]
+
+                        if reply_num != 0:
+                            logging.debug('reply num is: %s', reply_num)
+                            yield Request('http://tieba.baidu.com/p/' + post_id, callback=self.parse, meta={'post_id': post_id})
                     i = i + step
+                    logging.debug('current post index is: %s', i);
                 else:
                     break
         except Exception, e:
