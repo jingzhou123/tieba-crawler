@@ -65,14 +65,16 @@ class DbSpider(Spider):
         i = start_index
         while True:
             rows = self.query_some_records(i, step)
+            #logging.debug('rows are', rows)
 
             if rows:
                 for row in rows:
                     if self.should_go(row):
-                        logging.debug('now can go, with following num: %s, followd num: %s', row[2], row[3])
+                        #logging.debug('current valid row is', row)
+                        #logging.debug('now can go, with following num: %s, followd num: %s', row[2], row[3])
                         yield row
                 i = i + step
-                logging.debug('current index is: %s', i)
+                #logging.debug('current index is: %s', i)
             else:
                 break
 
