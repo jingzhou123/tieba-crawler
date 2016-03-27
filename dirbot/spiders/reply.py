@@ -79,11 +79,15 @@ class ReplySpider(CookieSpider, DbSpider):
         #拼接字符串
         item['body'] = ''.join(post.css('cc div::text').extract()).strip()
         item['title'] = Selector(response).css('.core_title_txt::text').extract_first()
-        item['post_time'] = json.loads(
-            post
-            .css('::attr(data-field)')
-            .extract_first()
-        )['content']['date']
+        try:
+            item['post_time'] = json.loads(
+                post
+                .css('::attr(data-field)')
+                .extract_first()
+            )['content']['date']
+        except Exception, e:
+            item['post_time'] = post.css('span.tail-info:last-child::text').extract_first().strip()
+
 
         return item;
 
