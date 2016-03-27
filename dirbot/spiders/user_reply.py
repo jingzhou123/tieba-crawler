@@ -22,6 +22,7 @@ class UserReplySpider(UserSpider):
 
         """
 
+        logging.debug('current index is: %s', start_index)
         cursor = self.conn.cursor()
         cursor.execute("""
             SELECT author_name from reply limit %s, %s

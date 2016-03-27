@@ -22,6 +22,7 @@ class UserPostSpider(UserSpider):
 
         """
 
+        logging.debug('current index is: %s', start_index)
         cursor = self.conn.cursor()
         cursor.execute("""
             SELECT author_name from post limit %s, %s

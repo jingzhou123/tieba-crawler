@@ -13,6 +13,15 @@ class FollowSpider(UserRelationSpider):
     name = 'follow'
     request_url_tmpl = 'http://tieba.baidu.com/home/concern?id=%s&fr=home'
 
+    def should_go(self, row):
+        """TODO: Docstring for should_go.
+
+        :row: TODO
+        :returns: TODO
+
+        """
+        return row[2] != 0
+
     def parse_page(self, response):
         """todo: docstring for parse_page.
 

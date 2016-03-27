@@ -27,7 +27,7 @@ class UserRelationSpider(CookieSpider, DbSpider):
         cursor = self.conn.cursor()
         # baidu_id: 用户的百度16字节id
         cursor.execute("""
-            select baidu_id, name from user limit %s, %s
+            select baidu_id, name, following_num, followed_num from user limit %s, %s
         """, (
             start_index,
             num

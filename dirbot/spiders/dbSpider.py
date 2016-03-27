@@ -38,6 +38,15 @@ class DbSpider(Spider):
         """
         return False
 
+    def should_go(self, row):
+        """TODO: Docstring for should_go.
+
+        :row: TODO
+        :returns: TODO
+
+        """
+        return True
+
     def query_some_records(self, start_index = 0, num = 50):
         """TODO: Docstring for query_some_records.
 
@@ -59,8 +68,11 @@ class DbSpider(Spider):
 
             if rows:
                 for row in rows:
-                    yield row
+                    if self.should_go(row):
+                        logging.debug('now can go, with following num: %s, followd num: %s', row[2], row[3])
+                        yield row
                 i = i + step
+                logging.debug('current index is: %s', i)
             else:
                 break
 
