@@ -119,7 +119,7 @@ class ReplySpider(CookieSpider, DbSpider):
                         post_id = str(row[0])
                         reply_num = row[1]
 
-                        if reply_num != 0:
+                        if True: # 贴子的准确时间只能去回复那里爬
                             logging.debug('reply num is: %s', reply_num)
                             yield Request('http://tieba.baidu.com/p/' + post_id, callback=self.parse, meta={'post_id': post_id})
                     i = i + step
