@@ -20,7 +20,7 @@ class FollowSpider(UserRelationSpider):
         :returns: TODO
 
         """
-        return row[2] != 0
+        return row[1] != 0
 
     def parse_page(self, response):
         """todo: docstring for parse_page.
