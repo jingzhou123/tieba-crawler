@@ -185,9 +185,9 @@ class PostPipeline(TbBasePipeline):
         """
         #logging.debug('filtering ads...')
         #logging.debug('post: %r' % (item))
-        if item['id'] == '-1':#广告贴
-            return
-        logging.debug('filtered ads...')
+        #if item['id'] == '-1':#广告贴
+        #    return
+        #    logging.debug('filtered ads...')
 
         item = self._fill_in_data(item)
         conn.execute( """

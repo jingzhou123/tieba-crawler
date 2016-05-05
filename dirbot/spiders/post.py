@@ -16,10 +16,11 @@ class PostSpider(CookieSpider, DbSpider):
     request_url_tmpl = 'http://tieba.baidu.com/f?ie=utf-8&kw=%s'
 
     def _extract_post_id(self, href):# href = /p/123456789
-        try:
-            return href.split('/')[-1]
-        except Exception, e:
-            return -1#没有ID的帖子就是广告，在pipeline里要过滤掉
+        return href.split('/')[-1]
+        #try:
+        #    return href.split('/')[-1]
+        #except Exception, e:
+        #    return -1#没有ID的帖子就是广告，在pipeline里要过滤掉
 
     def parse_page(self, response):
         """TODO: Docstring for parse_page.
